@@ -2,7 +2,8 @@
 # Search Problem
 
 ## State Representation
-A state represents the current configuration of birds on the branches. \
+A state represents the current configuration of birds on the branches.
+
 Example State:
 ```
 [
@@ -24,6 +25,7 @@ When the game starts, the birds are randomly shuffled and distributed among the 
 ## Goal State | Objective Test
 - Each branch contains birds of only one color.
 - Some branches may remain empty depending on the level configuration.
+
 Example state:
 ```
 [
