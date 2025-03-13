@@ -1,127 +1,103 @@
-import pygame
+import tkinter as tk
 import random
 
-# Configurações do jogo
-WIDTH, HEIGHT = 600, 800
-BIRD_COLORS = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0)]  # Cores dos pássaros
-BIRDS_PER_COLOR = 4  # Cada cor tem 4 pássaros
-TOTAL_BIRDS = BIRDS_PER_COLOR * len(BIRD_COLORS)  # 16 pássaros no total
+def center_window(root, width=600, height=800):
+    screen_width = root.winfo_screenwidth()
+    screen_height = root.winfo_screenheight()
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+    root.geometry(f"{width}x{height}+{x}+{y}")
 
-# Inicializar o Pygame
-pygame.init()
-screen = pygame.display.set_mode((WIDTH, HEIGHT))
-pygame.display.set_caption("Jogo dos Pássaros")
-clock = pygame.time.Clock()
-
-font = pygame.font.Font(None, 36)
-
-class Branch:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-        self.birds = []
-
-    def draw(self, screen):
-        pygame.draw.rect(screen, (139, 69, 19), (self.x, self.y, 80, 150))
-        for i, bird in enumerate(self.birds):
-            pygame.draw.circle(screen, bird, (self.x + 40, self.y + 30 + i * 30), 15)
-
-    def add_bird(self, color):
-        if len(self.birds) < 4:
-            self.birds.append(color)
-
-    def remove_bird(self):
-        if self.birds:
-            return self.birds.pop()
-        return None
-
-    def is_complete(self):
-        return len(self.birds) == 4 and all(b == self.birds[0] for b in self.birds)
-
-# Funções de distribuição para cada nível
-def distribuir_facil():
-    branches = [Branch(100 + i * 100, 500) for i in range(5)]
-    birds = BIRD_COLORS * 4  # 16 pássaros
-    random.shuffle(birds)
-    index = 0
-    while index < len(birds):
-        for branch in branches:
-            if index < len(birds) and len(branch.birds) < 4:
-                branch.add_bird(birds[index])
-                index += 1
-    return branches
-
-def distribuir_medio():
-    branches = [Branch(80 + i * 100, 500) for i in range(5)]
-    birds = BIRD_COLORS * 4
-    random.shuffle(birds)
-    index = 0
-    while index < len(birds):
-        for branch in branches:
-            if index < len(birds) and len(branch.birds) < 4:
-                branch.add_bird(birds[index])
-                index += 1
-    return branches
-
-def distribuir_dificil():
-    branches = [Branch(60 + i * 100, 500) for i in range(5)]
-    birds = BIRD_COLORS * 4
-    random.shuffle(birds)
-    index = 0
-    while index < len(birds):
-        for branch in branches:
-            if index < len(birds) and len(branch.birds) < 4:
-                branch.add_bird(birds[index])
-                index += 1
-    return branches
-
-def start_game(level):
-    if level == 'facil':
-        branches = distribuir_facil()
-    elif level == 'medio':
-        branches = distribuir_medio()
-    else:
-        branches = distribuir_dificil()
+class BirdSortGame:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Bird Sort Game")
+        center_window(self.root)
+        
+        self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
+        self.canvas.pack()
+        
+        self.bird_colors = ["red", "green", "blue", "yellow"]
+        self.branches = []
+        self.selected_branch = None
+        self.score = 0
+        
+        self.init_branches()
+        self.draw_game()
+        
+        self.root.bind("<Button-1>", self.on_click)
+        
+    def init_branches(self):
+        birds = self.bird_colors * 4  # 16 pássaros no total
+        random.shuffle(birds)
+        
+        positions = [(50, 500), (50, 650), (450, 400), (450, 550), (450, 700)]  # 2 ramos à esquerda, 3 à direita
+        for x, y in positions:
+            branch = {"x": x, "y": y, "birds": []}
+            self.branches.append(branch)
+        
+        index = 0
+        while index < len(birds):
+            for branch in self.branches:
+                if index < len(birds) and len(branch["birds"]) < 4:
+                    branch["birds"].append(birds[index])
+                    index += 1
     
-    score = 0
-    selected_branch = None
-    running = True
-    while running:
-        screen.fill((135, 206, 250))
+    def draw_game(self):
+        self.canvas.delete("all")
+        self.draw_background()
         
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                x, y = pygame.mouse.get_pos()
-                for branch in branches:
-                    if branch.x < x < branch.x + 80 and branch.y < y < branch.y + 150:
-                        if selected_branch is None:
-                            selected_branch = branch
-                        else:
-                            if selected_branch != branch:
-                                bird = selected_branch.remove_bird()
-                                if bird is not None:
-                                    branch.add_bird(bird)
-                            selected_branch = None
+        for branch in self.branches:
+            self.canvas.create_rectangle(branch["x"], branch["y"], branch["x"] + 120, branch["y"] + 20, fill="brown")
+            for i, bird in enumerate(branch["birds"]):
+                bird_x_offset = 10 + i * 25 if branch["x"] < 300 else 10 + i * 25
+                self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
+                                        branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
         
-        # Remover galhos completos e aumentar o score
+        self.canvas.create_text(500, 50, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+    
+    def draw_background(self):
+        cloud_positions = [(100, 100), (300, 150), (500, 80)]
+        for x, y in cloud_positions:
+            self.canvas.create_oval(x, y, x + 80, y + 50, fill="white", outline="white")
+            self.canvas.create_oval(x + 30, y - 20, x + 100, y + 30, fill="white", outline="white")
+            self.canvas.create_oval(x - 30, y - 10, x + 50, y + 40, fill="white", outline="white")
+    
+    def on_click(self, event):
+        for branch in self.branches:
+            if branch["x"] < event.x < branch["x"] + 120 and branch["y"] < event.y < branch["y"] + 20:
+                if self.selected_branch is None:
+                    self.selected_branch = branch
+                else:
+                    if self.selected_branch != branch:
+                        if self.selected_branch["birds"]:
+                            # Verifica se o ramo de destino tem espaço
+                            if len(branch["birds"]) < 4:
+                                print(f"Moving bird from {self.selected_branch['x']},{self.selected_branch['y']} to {branch['x']},{branch['y']}")
+                                # Move bird logic
+                                if self.selected_branch["x"] < 300:  # Ramos da esquerda
+                                    bird = self.selected_branch["birds"].pop()
+                                else:
+                                    bird = self.selected_branch["birds"].pop(0)
+                                
+                                if branch["x"] < 300:
+                                    branch["birds"].append(bird)
+                                else:
+                                    branch["birds"].insert(0, bird)
+                            else:
+                                print(f"Ramo cheio! Não foi possível mover o pássaro.")
+                    self.selected_branch = None
+                break
+        
+
+        self.check_complete()
+        self.draw_game()
+    
+    def check_complete(self):
         new_branches = []
-        for branch in branches:
-            if branch.is_complete():
-                score += 10
+        for branch in self.branches:
+            if len(branch["birds"]) == 4 and all(b == branch["birds"][0] for b in branch["birds"]):
+                self.score += 10
             else:
                 new_branches.append(branch)
-        branches = new_branches
-        
-        for branch in branches:
-            branch.draw(screen)
-        
-        score_text = font.render(f"Score: {score}", True, (0, 0, 0))
-        screen.blit(score_text, (WIDTH - 150, 20))
-        
-        pygame.display.flip()
-        clock.tick(30)
-    
-    pygame.quit()
-
+        self.branches = new_branches
