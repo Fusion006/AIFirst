@@ -2,6 +2,8 @@
 
 [Powerpoint checkpoint 1](https://www.canva.com/design/DAGhUuea1a8/CNkov_jamORCYTxVwx-6rA/edit?utm_content=DAGhUuea1a8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
+[See Search Problem in Detail](SearchProblem.md)
+
 ---
 
 ## **Step 1: Understanding the Game (Bird Sort 2 - Color Puzzle)**
@@ -98,4 +100,3 @@ Since the AI must solve this puzzle using search methods, we need to define:
 - `psutil` – For tracking memory usage during search execution (optional).
 
 ---
-
