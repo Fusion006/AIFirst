@@ -56,14 +56,14 @@ Example state:
 ## Heuristics/Evaluation Function
 To solve a puzzle at a given state, we can define a set of heuristics that will calculate how far we are from the goal.
 
-**H1.** Number of misplaced birds
+**H1. Number of misplaced birds** \
 Counts the number of birds that are not in a uniform branch of the same color.
 
-**H2.** - Number of incomplete branches
+**H2. Number of incomplete branches** \
 Counts the number of branches that do not contain only one color or are empty.
 
-**H3.** - Moves needed to free a branch
+**H3. Moves needed to free a branch** \
 Estimates the number of moves required to create at least one empty branch, which is useful for rearranging the birds.
 
-**H4.** - A combination of the above
+**H4. A combination of the above** \
 Example: H(state) = H1 + 0.5 * H2 to prioritize sorting while keeping track of incomplete branches.
