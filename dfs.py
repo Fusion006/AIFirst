@@ -1,159 +1,143 @@
-import copy
 import tkinter as tk
 from game import BirdSortGame, center_window
+import copy
 
 class BirdSortDFS:
     def __init__(self, root):
         self.root = root
         self.root.title("Bird Sort DFS Solution")
         center_window(self.root)
-        
-        # Initialize game instance but don't bind click events
+
         self.game = BirdSortGame(root)
-        self.game.root.unbind("<Button-1>")  # Disable click events
-        
-        # Store initial state
-        self.branches = copy.deepcopy(self.game.branches)
+        self.game.root.unbind("<Button-1>")  # Disable manual play
+
+        self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
         self.solution = []
         self.current_step = 0
-        
-        # Create controls
+
         self.create_controls()
-        
-        # Start solving
         self.solve()
-        
+
     def create_controls(self):
         control_frame = tk.Frame(self.root)
         control_frame.pack(pady=10)
-        
-        self.step_label = tk.Label(
-            control_frame, 
-            text="Step: 0/0", 
-            font=("Arial", 14)
-        )
+
+        self.step_label = tk.Label(control_frame, text="Step: 0/0", font=("Arial", 14))
         self.step_label.pack(side=tk.LEFT, padx=10)
-        
-        prev_button = tk.Button(
-            control_frame, 
-            text="← Previous", 
-            font=("Arial", 12), 
-            command=self.previous_step
-        )
-        next_button = tk.Button(
-            control_frame, 
-            text="Next →", 
-            font=("Arial", 12), 
-            command=self.next_step
-        )
-        
+
+        prev_button = tk.Button(control_frame, text="← Previous", font=("Arial", 12), command=self.previous_step)
+        next_button = tk.Button(control_frame, text="Next →", font=("Arial", 12), command=self.next_step)
+
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
-        
-        # Keyboard shortcuts
+
         self.root.bind("<Left>", lambda e: self.previous_step())
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
-    
+
     def solve(self):
         print("Starting DFS...")
-        stack = [(self.branches, [])]
+        stack = [(copy.deepcopy(self.branches), [])]
         visited = set()
         max_iterations = 100000
         iterations = 0
-        
+
         while stack and iterations < max_iterations:
-            state, moves = stack.pop()  # Key difference from BFS: pop() instead of pop(0)
-            state_tuple = tuple(tuple(branch["birds"]) for branch in state)
-            
+            state, moves = stack.pop()  # DFS -> LIFO
+            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
+
             if state_tuple in visited:
                 continue
-                
+
             visited.add(state_tuple)
             iterations += 1
-            
+
             if self.is_solved(state):
                 self.solution = moves
                 print(f"Solution found in {iterations} iterations!")
                 self.update_step_counter()
                 return
-            
+
             for new_state, move in self.get_possible_moves(state):
-                new_state_tuple = tuple(tuple(branch["birds"]) for branch in new_state)
+                new_state_tuple = tuple(tuple(branch) for branch in new_state)
                 if new_state_tuple not in visited:
                     stack.append((new_state, moves + [move]))
-        
+
         self.solution = None
         print(f"No solution found after {iterations} iterations.")
 
     def is_solved(self, state):
-        for branch in state:
-            if len(branch["birds"]) > 0:
-                first_bird = branch["birds"][0]
-                if any(bird != first_bird for bird in branch["birds"]):
-                    return False
-        return True
+        return all(len(branch) == 0 or len(set(branch)) == 1 for branch in state)  # Each branch must have same color birds
 
     def get_possible_moves(self, state):
         moves = []
+        state = [list(branch) for branch in state]  # Convert to mutable lists
+
         for i, src in enumerate(state):
-            if not src["birds"]:
-                continue
-            
+            if not src:
+                continue  # Skip empty branches
+
+            bird_to_move = src[-1]
+            move_group = 1
+            while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
+                move_group += 1
+
             for j, dst in enumerate(state):
-                if i != j and len(dst["birds"]) < 4:
-                    bird_to_move = src["birds"][-1]
-                    if len(dst["birds"]) == 0 or dst["birds"][-1] == bird_to_move:
-                        new_state = copy.deepcopy(state)
-                        bird = new_state[i]["birds"].pop()
-                        new_state[j]["birds"].append(bird)
-                        moves.append((new_state, (i, j)))
+                if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
+                    if not dst or dst[-1] == bird_to_move:
+                        new_state = copy.deepcopy(state)  # Copy before modifying
+                        birds_moving = new_state[i][-move_group:]  # Take the group
+                        new_state[i] = new_state[i][:-move_group]  # Remove from source
+                        new_state[j].extend(birds_moving)  # Add to destination
+                        moves.append((new_state, (i, j)))  
+
         return moves
 
     def draw_state(self, state):
         self.game.canvas.delete("all")
         self.game.draw_background()
-        
-        for branch in state:
-            self.game.canvas.create_rectangle(
-                branch["x"], branch["y"], 
-                branch["x"] + 120, branch["y"] + 20, 
-                fill="brown"
-            )
-            for i, bird in enumerate(branch["birds"]):
-                bird_x_offset = 10 + i * 25
-                self.game.canvas.create_oval(
-                    branch["x"] + bird_x_offset, branch["y"] - 30,
-                    branch["x"] + bird_x_offset + 25, branch["y"], 
-                    fill=bird
-                )
+
+        for index, branch in enumerate(state):
+            x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
+            self.game.canvas.create_rectangle(x, y, x + 120, y + 20, fill="brown")
+
+            for i, bird in enumerate(branch):
+                if x < 300:  # Left branches grow left-to-right
+                    bird_x_offset = 10 + i * 25
+                else:  # Right branches grow right-to-left
+                    bird_x_offset = 85 - i * 25  # Start from right side
+
+                self.game.canvas.create_oval(x + bird_x_offset, y - 30, 
+                                            x + bird_x_offset + 25, y, fill=bird)
+
 
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
-            current_state = copy.deepcopy(self.branches)
-            
-            for i in range(self.current_step):
-                src_idx, dst_idx = self.solution[i]
-                bird = current_state[src_idx]["birds"].pop()
-                current_state[dst_idx]["birds"].append(bird)
-            
-            self.draw_state(current_state)
-            self.update_step_counter()
+            self.rebuild_state(self.current_step)
 
     def next_step(self):
         if self.solution and self.current_step < len(self.solution):
-            current_state = copy.deepcopy(self.branches)
-            
-            for i in range(self.current_step + 1):
-                src_idx, dst_idx = self.solution[i]
-                bird = current_state[src_idx]["birds"].pop()
-                current_state[dst_idx]["birds"].append(bird)
-            
             self.current_step += 1
-            self.draw_state(current_state)
-            self.update_step_counter()
-            print(f"Step {self.current_step}: Move from branch {src_idx} to branch {dst_idx}")
+            self.rebuild_state(self.current_step)
+
+    def rebuild_state(self, step):
+        current_state = copy.deepcopy(self.branches)
+
+        for i in range(step):
+            src_idx, dst_idx = self.solution[i]
+
+            bird_to_move = current_state[src_idx][-1]
+            move_group = 1
+            while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
+                move_group += 1
+
+            birds_moving = current_state[src_idx][-move_group:]
+            current_state[src_idx] = current_state[src_idx][:-move_group]  
+            current_state[dst_idx].extend(birds_moving)
+
+        self.draw_state(current_state)
+        self.update_step_counter()
 
     def update_step_counter(self):
         if self.solution:
