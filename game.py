@@ -20,6 +20,7 @@ class BirdSortGame:
         self.bird_colors = ["red", "green", "blue", "yellow"]
         self.branches = []
         self.selected_branch = None
+        self.highlighted_branch = None
         self.score = 0
         
         self.init_branches()
@@ -30,7 +31,7 @@ class BirdSortGame:
     def init_branches(self):
         self.branches.clear()
 
-        positions = [(50, 350), (50, 500), (50, 650), (450, 400), (450, 550), (450, 700)]
+        positions = [(50, 200), (50, 350), (50, 500), (450, 250), (450, 400), (450, 550)]
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
         # 4 colors, 4 birds each (16 total)
@@ -73,29 +74,25 @@ class BirdSortGame:
         self.draw_background()
         
         for branch in self.branches:
-            self.canvas.create_rectangle(branch["x"], branch["y"], branch["x"] + 120, branch["y"] + 20, fill="brown")
-            num_birds = len(branch["birds"])
+            highlight_color = "darkgoldenrod" if branch == self.highlighted_branch else "brown"  # Highlight selection
+            
+            self.canvas.create_rectangle(branch["x"], branch["y"], branch["x"] + 120, branch["y"] + 20, fill=highlight_color)
             
             for i, bird in enumerate(branch["birds"]):
                 if branch["x"] < 300:  # Left branches grow left-to-right
                     bird_x_offset = 10 + i * 25
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 25  # Start from right side
+                    bird_x_offset = 85 - i * 25  
 
                 self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
                                         branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
 
         self.canvas.create_text(500, 50, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
 
-
-    
     def draw_background(self):
-        cloud_positions = [(100, 100), (300, 150), (500, 80)]
-        for x, y in cloud_positions:
-            self.canvas.create_oval(x, y, x + 80, y + 50, fill="white", outline="white")
-            self.canvas.create_oval(x + 30, y - 20, x + 100, y + 30, fill="white", outline="white")
-            self.canvas.create_oval(x - 30, y - 10, x + 50, y + 40, fill="white", outline="white")
-    
+        self.bg_image = tk.PhotoImage(file="images/background.png")  # Load the background image
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)  # Draw it on the canvas
+        
     def get_top_group(self, branch):
         if not branch["birds"]:
             return []
@@ -128,27 +125,27 @@ class BirdSortGame:
         for branch in self.branches:
             if branch["x"] < event.x < branch["x"] + 120 and branch["y"] < event.y < branch["y"] + 20:
                 if self.selected_branch is None:
-                    if branch["birds"]:  # Only select if there are birds to move
+                    if branch["birds"]:
                         self.selected_branch = branch
+                        self.highlighted_branch = branch  # Highlight it
                 else:
                     if self.selected_branch != branch:
                         if self.selected_branch["birds"]:
-                            # Identify the birds that should move as a group
                             moving_birds = self.get_top_group(self.selected_branch)
-
-                            # Check if move is valid
                             if self.can_move(moving_birds, branch):
                                 print(f"Moving birds {moving_birds} from {self.selected_branch['x']},{self.selected_branch['y']} to {branch['x']},{branch['y']}")
                                 
                                 for bird in moving_birds:
-                                    self.selected_branch["birds"].remove(bird)  # Remove from original branch
-                                    branch["birds"].append(bird)  # Add to target branch
+                                    self.selected_branch["birds"].remove(bird)
+                                    branch["birds"].append(bird)
 
-                        self.selected_branch = None  # Deselect after the move
+                        self.selected_branch = None
+                        self.highlighted_branch = None  # Remove highlight after move
                 break
 
         self.check_complete()
         self.draw_game()
+
 
     
     def check_complete(self):
