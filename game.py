@@ -25,9 +25,22 @@ class BirdSortGame:
         
         self.init_branches()
         self.draw_game()
+        self.create_back_button()
         
         self.root.bind("<Button-1>", self.on_click)
-        
+
+    def go_back_to_menu(self):
+        """Returns to the main menu and closes the current game window."""
+        self.root.destroy()  
+        from main_menu import MainMenu  
+        new_root = tk.Tk()  # Create a new root window
+        MainMenu(new_root)  # Open the main menu
+        new_root.mainloop()  # Start the event loop
+
+    def create_back_button(self):
+        self.back_button = tk.Button(self.root, text="← Go Back", font=("Arial", 12), command=self.go_back_to_menu, bg="lightgray", fg="black")
+        self.back_button.place(x=10, y=10)  # Position at top-left
+
     def init_branches(self):
         self.branches.clear()
 
@@ -87,7 +100,8 @@ class BirdSortGame:
                 self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
                                         branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
 
-        self.canvas.create_text(500, 50, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+        self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+                              # 500, 50 se quiserem meter como estava originalmente :)
 
     def draw_background(self):
         self.bg_image = tk.PhotoImage(file="images/background.png")  # Load the background image
@@ -135,9 +149,8 @@ class BirdSortGame:
                             if self.can_move(moving_birds, branch):
                                 print(f"Moving birds {moving_birds} from {self.selected_branch['x']},{self.selected_branch['y']} to {branch['x']},{branch['y']}")
                                 
-                                for bird in moving_birds:
-                                    self.selected_branch["birds"].remove(bird)
-                                    branch["birds"].append(bird)
+                                for _ in range(len(moving_birds)):
+                                    branch["birds"].append(self.selected_branch["birds"].pop())  # Ensure order is preserved
 
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
