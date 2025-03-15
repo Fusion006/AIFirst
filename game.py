@@ -25,9 +25,22 @@ class BirdSortGame:
         
         self.init_branches()
         self.draw_game()
+        self.create_back_button()
         
         self.root.bind("<Button-1>", self.on_click)
-        
+
+    def go_back_to_menu(self):
+        """Returns to the main menu and closes the current game window."""
+        self.root.destroy()  
+        from main_menu import MainMenu  
+        new_root = tk.Tk()  # Create a new root window
+        MainMenu(new_root)  # Open the main menu
+        new_root.mainloop()  # Start the event loop
+
+    def create_back_button(self):
+        self.back_button = tk.Button(self.root, text="← Go Back", font=("Arial", 12), command=self.go_back_to_menu, bg="lightgray", fg="black")
+        self.back_button.place(x=10, y=10)  # Position at top-left
+
     def init_branches(self):
         self.branches.clear()
 
@@ -87,7 +100,8 @@ class BirdSortGame:
                 self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
                                         branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
 
-        self.canvas.create_text(500, 50, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+        self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+                              # 500, 50 se quiserem meter como estava originalmente :)
 
     def draw_background(self):
         self.bg_image = tk.PhotoImage(file="images/background.png")  # Load the background image
@@ -135,24 +149,56 @@ class BirdSortGame:
                             if self.can_move(moving_birds, branch):
                                 print(f"Moving birds {moving_birds} from {self.selected_branch['x']},{self.selected_branch['y']} to {branch['x']},{branch['y']}")
                                 
-                                for bird in moving_birds:
-                                    self.selected_branch["birds"].remove(bird)
-                                    branch["birds"].append(bird)
+                                for _ in range(len(moving_birds)):
+                                    branch["birds"].append(self.selected_branch["birds"].pop())  # Ensure order is preserved
 
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
                 break
 
-        self.check_complete()
         self.draw_game()
-
-
+        self.check_complete()
     
     def check_complete(self):
         new_branches = []
         for branch in self.branches:
             if len(branch["birds"]) == 4 and all(b == branch["birds"][0] for b in branch["birds"]):
-                self.score += 10
+                self.score += 100
             else:
                 new_branches.append(branch)
         self.branches = new_branches
+
+        self.draw_game()
+
+        if self.is_game_won():
+            self.show_win_popup()
+
+    def is_game_won(self):
+        """Checks if all non-empty branches contain uniform colors."""
+        for branch in self.branches:
+            if branch["birds"] and (len(branch["birds"]) != 4 or len(set(branch["birds"])) != 1):
+                return False
+        return True
+
+    def show_win_popup(self):
+        """Displays the win message and a button to return to the main menu."""
+        popup = tk.Toplevel(self.root)
+        popup.title("Game Over")
+        center_window(popup, 400, 200)
+
+        tk.Label(popup, text="🎉 Congratulations! 🎉", font=("Arial", 20)).pack(pady=10)
+        tk.Label(popup, text=f"Final Score: {self.score}", font=("Arial", 16)).pack(pady=5)
+
+        def return_to_menu():
+            popup.destroy()
+            self.root.destroy()
+            from main_menu import MainMenu
+            new_root = tk.Tk()
+            MainMenu(new_root)
+            new_root.mainloop()
+
+        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), command=return_to_menu).pack(pady=20)
+
+        popup.transient(self.root)
+        popup.grab_set()
+        self.root.wait_window(popup)
