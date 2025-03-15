@@ -143,16 +143,49 @@ class BirdSortGame:
                         self.highlighted_branch = None  # Remove highlight after move
                 break
 
-        self.check_complete()
         self.draw_game()
-
-
+        self.check_complete()
     
     def check_complete(self):
         new_branches = []
         for branch in self.branches:
             if len(branch["birds"]) == 4 and all(b == branch["birds"][0] for b in branch["birds"]):
-                self.score += 10
+                self.score += 100
             else:
                 new_branches.append(branch)
         self.branches = new_branches
+
+        self.draw_game()
+
+        if self.is_game_won():
+            self.show_win_popup()
+
+    def is_game_won(self):
+        """Checks if all non-empty branches contain uniform colors."""
+        for branch in self.branches:
+            if branch["birds"] and (len(branch["birds"]) != 4 or len(set(branch["birds"])) != 1):
+                return False
+        return True
+
+    def show_win_popup(self):
+        """Displays the win message and a button to return to the main menu."""
+        popup = tk.Toplevel(self.root)
+        popup.title("Game Over")
+        center_window(popup, 400, 200)
+
+        tk.Label(popup, text="🎉 Congratulations! 🎉", font=("Arial", 20)).pack(pady=10)
+        tk.Label(popup, text=f"Final Score: {self.score}", font=("Arial", 16)).pack(pady=5)
+
+        def return_to_menu():
+            popup.destroy()
+            self.root.destroy()
+            from main_menu import MainMenu
+            new_root = tk.Tk()
+            MainMenu(new_root)
+            new_root.mainloop()
+
+        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), command=return_to_menu).pack(pady=20)
+
+        popup.transient(self.root)
+        popup.grab_set()
+        self.root.wait_window(popup)
