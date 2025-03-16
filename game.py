@@ -24,8 +24,9 @@ class BirdSortGame:
         # Load and resize bird images
         for color in self.bird_colors:
             img = Image.open(f"images/{color}_bird.png")  # Ensure you have images like "red_bird.png"
-            img = img.resize((30, 30), Image.Resampling.LANCZOS)  # Resize to fit the branches
+            img = img.resize((50, 50), Image.Resampling.LANCZOS)  # Resize to fit the branches
             self.bird_images[color] = ImageTk.PhotoImage(img)
+            self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  # Flipped
 
         self.branches = []
         self.selected_branch = None
@@ -97,19 +98,20 @@ class BirdSortGame:
         
         for branch in self.branches:
             highlight_color = "darkgoldenrod" if branch == self.highlighted_branch else "brown"  # Highlight selection
-            
             self.canvas.create_rectangle(branch["x"], branch["y"], branch["x"] + 120, branch["y"] + 20, fill=highlight_color)
 
             for i, bird in enumerate(branch["birds"]):
                 if branch["x"] < 300:  # Left branches grow left-to-right
                     bird_x_offset = 10 + i * 25
+                    bird_image = self.bird_images[bird + "_flipped"]  # Use normal image
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 25  
+                    bird_x_offset = 85 - i * 25 
+                    bird_image = self.bird_images[bird]  # Use flipped image
 
                 # self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
                 #                        branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
                 # Place the image instead of drawing an oval
-                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 15, anchor=tk.NW, image=self.bird_images[bird])
+                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 15, anchor=tk.NW, image=bird_image)
 
 
         self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
