@@ -31,7 +31,7 @@ class BirdSortGame:
         self.branches = []
         self.selected_branch = None
         self.highlighted_branch = None
-        self.score = 0
+        self.score = 100
         
         self.init_branches()
         self.draw_game()
