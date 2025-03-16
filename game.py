@@ -125,10 +125,10 @@ class BirdSortGame:
                     bird_x_offset = 10 + i * 35
                     bird_image = self.bird_images[bird + "_flipped"]  # Use normal image
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 35 
+                    bird_x_offset = 140 - i * 35 
                     bird_image = self.bird_images[bird] 
 
-                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 15, anchor=tk.NW, image=bird_image)
+                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 35, anchor=tk.NW, image=bird_image)
 
 
         self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
