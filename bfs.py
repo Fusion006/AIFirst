@@ -54,7 +54,8 @@ class BirdSortBFS:
             iterations += 1
 
             if self.is_solved(state):
-                self.solution = moves
+                self.solution = moves + [None]  # Append a None step to indicate the final state
+                self.final_state = copy.deepcopy(state)  # Store the final state separately
                 print(f"Solution found in {iterations} iterations!")
                 self.update_step_counter()
                 return
@@ -100,16 +101,26 @@ class BirdSortBFS:
 
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
-            self.game.canvas.create_rectangle(x, y, x + 120, y + 20, fill="brown")
+            
+            # Choose the correct branch image based on position
+            if x < 300:  # Left side
+                branch_img = self.game.branch_img_left_tk
+            else:  # Right side
+                branch_img = self.game.branch_img_tk
+
+            # Draw the branch
+            self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
                 if x < 300:  # Left branches grow left-to-right
-                    bird_x_offset = 10 + i * 25
+                    bird_x_offset = 10 + i * 35
+                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 25  # Start from right side
+                    bird_x_offset = 140 - i * 35
+                    bird_image = self.game.bird_images[bird]
 
-                self.game.canvas.create_oval(x + bird_x_offset, y - 30, 
-                                             x + bird_x_offset + 25, y, fill=bird)
+                self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
+
 
     def previous_step(self):
         if self.current_step > 0:
@@ -122,21 +133,26 @@ class BirdSortBFS:
             self.rebuild_state(self.current_step)
 
     def rebuild_state(self, step):
-        current_state = copy.deepcopy(self.branches)
+        if step == len(self.solution):  
+            # If at the final step, just display the solved state
+            self.draw_state(self.final_state)
+        else:
+            current_state = copy.deepcopy(self.branches)
 
-        for i in range(step):
-            src_idx, dst_idx = self.solution[i]
+            for i in range(step):
+                src_idx, dst_idx = self.solution[i]
 
-            bird_to_move = current_state[src_idx][-1]
-            move_group = 1
-            while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
-                move_group += 1
+                bird_to_move = current_state[src_idx][-1]
+                move_group = 1
+                while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
+                    move_group += 1
 
-            birds_moving = current_state[src_idx][-move_group:]
-            current_state[src_idx] = current_state[src_idx][:-move_group]  
-            current_state[dst_idx].extend(birds_moving)
+                birds_moving = current_state[src_idx][-move_group:]
+                current_state[src_idx] = current_state[src_idx][:-move_group]
+                current_state[dst_idx].extend(birds_moving)
 
-        self.draw_state(current_state)
+            self.draw_state(current_state)
+
         self.update_step_counter()
 
     def update_step_counter(self):
