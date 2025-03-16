@@ -68,7 +68,19 @@ class BirdSortGame:
     def init_branches(self):
         self.branches.clear()
 
-        positions = [(0, 200), (0, 350), (0, 500), (400, 250), (400, 400), (400, 550)]
+        def generate_branch_positions():
+            start_y1 = random.choice([150, 200, 250])  # Choose a random starting height
+            start_y2 = random.choice([150, 200, 250])  # Choose a random starting height
+            y1_positions = [start_y1, start_y1 + 150, start_y1 + 300]  # Fixed increments of 150
+            y2_positions = [start_y2, start_y2 + 150, start_y2 + 300]  # Fixed increments of 150
+
+            left_branches = [(0, y) for y in y1_positions]
+            right_branches = [(400, 50+y) for y in y2_positions]
+
+            return left_branches + right_branches
+
+        positions = generate_branch_positions()
+
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
         # 4 colors, 4 birds each (16 total)
