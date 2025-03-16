@@ -21,10 +21,24 @@ class BirdSortGame:
         self.bird_colors = ["red", "green", "blue", "yellow"]
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
+        # Load branch images
+        self.branch_img = Image.open("images/branch.png").resize((200, 30), Image.Resampling.LANCZOS)
+        self.highlighted_branch_img = Image.open("images/branch_highlighted.png").resize((200, 30), Image.Resampling.LANCZOS)
+
+        # Flip branch images for left side
+        self.branch_img_left = self.branch_img.transpose(Image.FLIP_LEFT_RIGHT)
+        self.highlighted_branch_img_left = self.highlighted_branch_img.transpose(Image.FLIP_LEFT_RIGHT)
+
+        # Convert images to Tkinter PhotoImage
+        self.branch_img_tk = ImageTk.PhotoImage(self.branch_img)
+        self.highlighted_branch_img_tk = ImageTk.PhotoImage(self.highlighted_branch_img)
+        self.branch_img_left_tk = ImageTk.PhotoImage(self.branch_img_left)
+        self.highlighted_branch_img_left_tk = ImageTk.PhotoImage(self.highlighted_branch_img_left)
+
         # Load and resize bird images
         for color in self.bird_colors:
             img = Image.open(f"images/{color}_bird.png")  # Ensure you have images like "red_bird.png"
-            img = img.resize((30, 30), Image.Resampling.LANCZOS)  # Resize to fit the branches
+            img = img.resize((50, 50), Image.Resampling.LANCZOS)  # Resize to fit the branches
             self.bird_images[color] = ImageTk.PhotoImage(img)
 
         self.branches = []
@@ -53,7 +67,7 @@ class BirdSortGame:
     def init_branches(self):
         self.branches.clear()
 
-        positions = [(50, 200), (50, 350), (50, 500), (450, 250), (450, 400), (450, 550)]
+        positions = [(0, 200), (0, 350), (0, 500), (400, 250), (400, 400), (400, 550)]
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
         # 4 colors, 4 birds each (16 total)
@@ -96,15 +110,20 @@ class BirdSortGame:
         self.draw_background()
         
         for branch in self.branches:
-            highlight_color = "darkgoldenrod" if branch == self.highlighted_branch else "brown"  # Highlight selection
-            
-            self.canvas.create_rectangle(branch["x"], branch["y"], branch["x"] + 120, branch["y"] + 20, fill=highlight_color)
+            # Choose the correct image based on the side of the screen
+            if branch["x"] < 300:  # Left side
+                branch_img = self.highlighted_branch_img_left_tk if branch == self.highlighted_branch else self.branch_img_left_tk
+            else:  # Right side
+                branch_img = self.highlighted_branch_img_tk if branch == self.highlighted_branch else self.branch_img_tk
+
+            # Draw the branch image
+            self.canvas.create_image(branch["x"], branch["y"], anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch["birds"]):
                 if branch["x"] < 300:  # Left branches grow left-to-right
-                    bird_x_offset = 10 + i * 25
+                    bird_x_offset = 10 + i * 35
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 25  
+                    bird_x_offset = 85 - i * 35 
 
                 # self.canvas.create_oval(branch["x"] + bird_x_offset, branch["y"] - 30,
                 #                        branch["x"] + bird_x_offset + 25, branch["y"], fill=bird)
@@ -149,7 +168,7 @@ class BirdSortGame:
 
     def on_click(self, event):
         for branch in self.branches:
-            if branch["x"] < event.x < branch["x"] + 120 and branch["y"] < event.y < branch["y"] + 20:
+            if branch["x"] < event.x < branch["x"] + 200 and branch["y"] < event.y < branch["y"] + 30:
                 if self.selected_branch is None:
                     if branch["birds"]:
                         self.selected_branch = branch
