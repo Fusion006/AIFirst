@@ -45,7 +45,7 @@ class BirdSortGame:
         self.branches = []
         self.selected_branch = None
         self.highlighted_branch = None
-        self.score = 0
+        self.score = 100
         
         self.init_branches()
         self.draw_game()
@@ -182,7 +182,7 @@ class BirdSortGame:
                                 
                                 for _ in range(len(moving_birds)):
                                     branch["birds"].append(self.selected_branch["birds"].pop())  # Ensure order is preserved
-
+                                self.score -= 5  # Deduct 5 points per move
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
                 break
@@ -194,7 +194,7 @@ class BirdSortGame:
         new_branches = []
         for branch in self.branches:
             if len(branch["birds"]) == 4 and all(b == branch["birds"][0] for b in branch["birds"]):
-                self.score += 100
+                self.score += 50
             else:
                 new_branches.append(branch)
         self.branches = new_branches
