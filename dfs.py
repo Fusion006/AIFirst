@@ -99,16 +99,25 @@ class BirdSortDFS:
 
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
-            self.game.canvas.create_rectangle(x, y, x + 120, y + 20, fill="brown")
+            
+            # Choose the correct branch image based on position
+            if x < 300:  # Left side
+                branch_img = self.game.branch_img_left_tk
+            else:  # Right side
+                branch_img = self.game.branch_img_tk
+
+            # Draw the branch
+            self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
                 if x < 300:  # Left branches grow left-to-right
-                    bird_x_offset = 10 + i * 25
+                    bird_x_offset = 10 + i * 35
+                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
                 else:  # Right branches grow right-to-left
-                    bird_x_offset = 85 - i * 25  # Start from right side
+                    bird_x_offset = 140 - i * 35
+                    bird_image = self.game.bird_images[bird]
 
-                self.game.canvas.create_oval(x + bird_x_offset, y - 30, 
-                                            x + bird_x_offset + 25, y, fill=bird)
+                self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
 
 
     def previous_step(self):

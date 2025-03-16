@@ -1,7 +1,7 @@
 from tkinter import Tk, Label, Button, messagebox
 from game import center_window
 from game import BirdSortGame
-from bfs import BirdSortBFS  # Importa a IA BFS
+from bfs import BirdSortBFS 
 from dfs import BirdSortDFS
 
 class AiSubmenu:
