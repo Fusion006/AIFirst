@@ -18,10 +18,10 @@ class BirdSortGame:
         self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
         self.canvas.pack()
         
-        self.bird_colors = ["red", "green", "blue", "yellow"]
+        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple"], 4)
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
-        # Load branch images
+        # Load branch images 
         self.branch_img = Image.open("images/branch.png").resize((200, 30), Image.Resampling.LANCZOS)
         self.highlighted_branch_img = Image.open("images/branch_highlighted.png").resize((200, 30), Image.Resampling.LANCZOS)
 
@@ -182,7 +182,7 @@ class BirdSortGame:
                                 
                                 for _ in range(len(moving_birds)):
                                     branch["birds"].append(self.selected_branch["birds"].pop())  # Ensure order is preserved
-                                self.score -= 5  # Deduct 5 points per move
+                                self.score -= 5
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
                 break
