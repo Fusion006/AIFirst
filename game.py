@@ -22,7 +22,22 @@ class BirdSortGame:
         self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
         self.canvas.pack()
         
-        num_colors = 4 + (self.difficulty // 5)
+        difficulty_settings = {
+            range(1, 5): (4, 6),
+            range(5, 10): (5, 8),
+            range(10, 15): (6, 9),
+            range(15, 20): (7, 10),
+            range(20, 25): (8, 12),
+            range(25, 30): (9, 13),
+        }
+        def get_difficulty_settings(difficulty):
+            for key, value in difficulty_settings.items():
+                if difficulty in key:
+                    return value
+            return (4, 6) 
+    
+        num_colors, num_branches = get_difficulty_settings(self.difficulty)
+
         self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink"], num_colors)
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
@@ -50,13 +65,13 @@ class BirdSortGame:
         self.selected_branch = None
         self.highlighted_branch = None
         self.score = 100
-        self.init_branches()
+        self.init_branches(num_branches)
         self.draw_game()
         self.create_back_button()
         
         self.root.bind("<Button-1>", self.on_click)
 
-
+    
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
         reset_difficulty() 
@@ -72,47 +87,56 @@ class BirdSortGame:
         self.back_button.place(x=10, y=10) 
 
 
-    def init_branches(self):
+    def init_branches(self, num_branches):
         self.branches.clear()
 
+        num_birds_per_branch = 4  # Each branch holds 4 birds
+
+        # Generate positions based on the new number of branches
         def generate_branch_positions():
-            start_y1 = random.choice([150, 200, 250]) 
-            start_y2 = random.choice([150, 200, 250]) 
-            y1_positions = [start_y1, start_y1 + 150, start_y1 + 300] 
-            y2_positions = [start_y2, start_y2 + 150, start_y2 + 300] 
+            screen_height = 750  # Max height
+            branch_spacing = 80  # Space between branches
+            num_per_side = num_branches // 2
+            num_left = num_branches // 2
+            num_right = num_branches - num_left
+
+            # Calculate dynamic starting Y so branches are centered
+            total_branch_height = (num_per_side - 1) * branch_spacing
+            start_y1 = max(150, (screen_height - total_branch_height) // 2)
+            start_y2 = start_y1 + random.choice([-20, 20])  # Slight offset for variation
+
+            # Generate positions
+            y1_positions = [start_y1 + (i * branch_spacing) for i in range(num_left)]
+            y2_positions = [start_y2 + (i * branch_spacing) for i in range(num_right)]
+
+            # Ensure branches don't exceed the bottom of the screen
+            y1_positions = [y for y in y1_positions if y + branch_spacing <= screen_height]
+            y2_positions = [y for y in y2_positions if y + branch_spacing <= screen_height]
 
             left_branches = [(0, y) for y in y1_positions]
-            right_branches = [(400, 50+y) for y in y2_positions]
+            right_branches = [(400, y) for y in y2_positions]
 
             return left_branches + right_branches
 
-        positions = generate_branch_positions()
 
+        positions = generate_branch_positions()[:num_branches]  # Adjust to required number of branches
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
-        # 4 colors, 4 birds each (16 total)
-        birds = self.bird_colors * 4 
+        birds = self.bird_colors * num_birds_per_branch  
         random.shuffle(birds)
 
         # Distribute birds randomly but evenly across branches
         index = 0
         while index < len(birds):
             for branch in self.branches:
-                if index < len(birds) and len(branch["birds"]) < 4:
+                if index < len(birds) and len(branch["birds"]) < num_birds_per_branch:
                     branch["birds"].append(birds[index])
                     index += 1
 
-        # Make random swaps to ensure solvability
-        for _ in range(50):  # Perform 50 random swaps
-            src, dest = random.sample(self.branches, 2)
-            if src["birds"] and len(dest["birds"]) < 4:
-                bird = src["birds"].pop()
-                dest["birds"].append(bird)
-        
-        # Ensure there's at least one valid move
+        # Ensure solvability
         if not self.has_valid_move():
-            self.init_branches()  # Retry if no valid move exists
-    
+            self.init_branches(num_branches)
+
 
     # Checks if there is at least one valid move possible
     def has_valid_move(self):
@@ -183,7 +207,9 @@ class BirdSortGame:
 
 
     def on_click(self, event):
+        #print("Branches:", self.branches)
         for branch in self.branches:
+            #print(f"Branch at ({branch['x']}, {branch['y']}) with birds: {branch['birds']}")
             if branch["x"] < event.x < branch["x"] + 200 and branch["y"] < event.y < branch["y"] + 30:
                 if self.selected_branch is None:
                     if branch["birds"]:
@@ -232,8 +258,33 @@ class BirdSortGame:
     def reset_game(self):
         """Resets the game state and starts a new round with increased difficulty."""
         self.difficulty = get_difficulty()  # Get updated difficulty
-        self.branches.clear()
-        self.init_branches()
+
+        difficulty_settings = {
+            range(1, 5): (4, 6),
+            range(5, 10): (5, 8),
+            range(10, 15): (6, 9),
+            range(15, 20): (7, 10),
+            range(20, 25): (8, 12),
+            range(25, 30): (9, 13),
+        }
+        def get_difficulty_settings(difficulty):
+            for key, value in difficulty_settings.items():
+                if difficulty in key:
+                    return value
+            return (4, 6) 
+        
+        num_colors, num_branches = get_difficulty_settings(self.difficulty)
+
+        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink"], num_colors)
+
+        # Reload bird images
+        self.bird_images.clear()
+        for color in self.bird_colors:
+            img = Image.open(f"images/{color}_bird.png").resize((50, 50), Image.Resampling.LANCZOS)
+            self.bird_images[color] = ImageTk.PhotoImage(img)
+            self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))
+
+        self.init_branches(num_branches)  # Pass the calculated number of branches
         self.draw_game()
 
 
