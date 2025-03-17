@@ -1,6 +1,9 @@
 import tkinter as tk
 import random
 from PIL import Image, ImageTk
+from difficulty_manager import increase_difficulty
+from difficulty_manager import reset_difficulty
+from difficulty_manager import get_difficulty
 
 def center_window(root, width=600, height=800):
     screen_width = root.winfo_screenwidth()
@@ -13,12 +16,14 @@ class BirdSortGame:
     def __init__(self, root):
         self.root = root
         self.root.title("Bird Sort Game")
+        self.difficulty = get_difficulty()
         center_window(self.root)
         
         self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
         self.canvas.pack()
         
-        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple"], 4)
+        num_colors = 4 + (self.difficulty // 5)
+        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink"], num_colors)
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
         # Load branch images 
@@ -37,8 +42,7 @@ class BirdSortGame:
 
         # Load and resize bird images
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png") 
-            img = img.resize((50, 50), Image.Resampling.LANCZOS)  
+            img = Image.open(f"images/{color}_bird.png").resize((50, 50), Image.Resampling.LANCZOS)  
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
 
@@ -46,7 +50,6 @@ class BirdSortGame:
         self.selected_branch = None
         self.highlighted_branch = None
         self.score = 100
-        
         self.init_branches()
         self.draw_game()
         self.create_back_button()
@@ -56,6 +59,7 @@ class BirdSortGame:
 
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
+        reset_difficulty() 
         self.root.destroy()  
         from main_menu import MainMenu  
         new_root = tk.Tk()  
@@ -87,7 +91,7 @@ class BirdSortGame:
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
         # 4 colors, 4 birds each (16 total)
-        birds = self.bird_colors * 4
+        birds = self.bird_colors * 4 
         random.shuffle(birds)
 
         # Distribute birds randomly but evenly across branches
@@ -137,17 +141,12 @@ class BirdSortGame:
             self.canvas.create_image(branch["x"], branch["y"], anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch["birds"]):
-                if branch["x"] < 300:  # Left branches grow left-to-right
-                    bird_x_offset = 10 + i * 35
-                    bird_image = self.bird_images[bird + "_flipped"] 
-                else:  # Right branches grow right-to-left
-                    bird_x_offset = 140 - i * 35 
-                    bird_image = self.bird_images[bird] 
-
+                bird_x_offset = 10 + i * 35 if branch["x"] < 300 else 140 - i * 35
+                bird_image = self.bird_images[bird + "_flipped"] if branch["x"] < 300 else self.bird_images[bird]
                 self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 35, anchor=tk.NW, image=bird_image)
 
         self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
-
+        self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Arial", 14), fill="black")
 
     def draw_background(self):
         self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
@@ -230,6 +229,14 @@ class BirdSortGame:
         return True
 
 
+    def reset_game(self):
+        """Resets the game state and starts a new round with increased difficulty."""
+        self.difficulty = get_difficulty()  # Get updated difficulty
+        self.branches.clear()
+        self.init_branches()
+        self.draw_game()
+
+
     def show_win_popup(self):
         popup = tk.Toplevel(self.root)
         popup.title("Game Over")
@@ -238,7 +245,13 @@ class BirdSortGame:
         tk.Label(popup, text="🎉 Congratulations! 🎉", font=("Arial", 20)).pack(pady=10)
         tk.Label(popup, text=f"Final Score: {self.score}", font=("Arial", 16)).pack(pady=5)
 
+        def next_level():
+            increase_difficulty()  # Increase difficulty before restarting
+            popup.destroy()
+            self.reset_game()  # Restart the game with new settings
+            
         def return_to_menu():
+            reset_difficulty() 
             popup.destroy()
             self.root.destroy()
             from main_menu import MainMenu
@@ -246,8 +259,9 @@ class BirdSortGame:
             MainMenu(new_root)
             new_root.mainloop()
 
-        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), command=return_to_menu).pack(pady=20)
+        tk.Button(popup, text="Go to Next Level", font=("Arial", 14), command=next_level).pack(pady=10)
+        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), command=return_to_menu).pack(pady=10)
 
         popup.transient(self.root)
-        popup.grab_set()
+        popup.after(10, lambda: popup.grab_set())
         self.root.wait_window(popup)
