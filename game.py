@@ -37,10 +37,10 @@ class BirdSortGame:
 
         # Load and resize bird images
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png")  # Ensure you have images like "red_bird.png"
-            img = img.resize((50, 50), Image.Resampling.LANCZOS)  # Resize to fit the branches
+            img = Image.open(f"images/{color}_bird.png") 
+            img = img.resize((50, 50), Image.Resampling.LANCZOS)  
             self.bird_images[color] = ImageTk.PhotoImage(img)
-            self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  # Flipped
+            self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
 
         self.branches = []
         self.selected_branch = None
@@ -53,22 +53,37 @@ class BirdSortGame:
         
         self.root.bind("<Button-1>", self.on_click)
 
+
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
         self.root.destroy()  
         from main_menu import MainMenu  
-        new_root = tk.Tk()  # Create a new root window
-        MainMenu(new_root)  # Open the main menu
-        new_root.mainloop()  # Start the event loop
+        new_root = tk.Tk()  
+        MainMenu(new_root) 
+        new_root.mainloop()  
+
 
     def create_back_button(self):
         self.back_button = tk.Button(self.root, text="← Go Back", font=("Arial", 12), command=self.go_back_to_menu, bg="lightgray", fg="black")
-        self.back_button.place(x=10, y=10)  # Position at top-left
+        self.back_button.place(x=10, y=10) 
+
 
     def init_branches(self):
         self.branches.clear()
 
-        positions = [(0, 200), (0, 350), (0, 500), (400, 250), (400, 400), (400, 550)]
+        def generate_branch_positions():
+            start_y1 = random.choice([150, 200, 250]) 
+            start_y2 = random.choice([150, 200, 250]) 
+            y1_positions = [start_y1, start_y1 + 150, start_y1 + 300] 
+            y2_positions = [start_y2, start_y2 + 150, start_y2 + 300] 
+
+            left_branches = [(0, y) for y in y1_positions]
+            right_branches = [(400, 50+y) for y in y2_positions]
+
+            return left_branches + right_branches
+
+        positions = generate_branch_positions()
+
         self.branches = [{"x": x, "y": y, "birds": []} for x, y in positions]
 
         # 4 colors, 4 birds each (16 total)
@@ -93,16 +108,17 @@ class BirdSortGame:
         # Ensure there's at least one valid move
         if not self.has_valid_move():
             self.init_branches()  # Retry if no valid move exists
+    
 
+    # Checks if there is at least one valid move possible
     def has_valid_move(self):
-        """Checks if there is at least one valid move possible"""
         for src in self.branches:
             if not src["birds"]:
-                continue  # Ignore empty branches
+                continue 
             top_group = self.get_top_group(src)
             for dest in self.branches:
                 if src != dest and self.can_move(top_group, dest):
-                    return True  # At least one move is possible
+                    return True
         return False
 
     
@@ -111,38 +127,38 @@ class BirdSortGame:
         self.draw_background()
         
         for branch in self.branches:
-            # Choose the correct image based on the side of the screen
-            if branch["x"] < 300:  # Left side
+            # Left side:
+            if branch["x"] < 300:  
                 branch_img = self.highlighted_branch_img_left_tk if branch == self.highlighted_branch else self.branch_img_left_tk
-            else:  # Right side
+            # Right side:
+            else:  
                 branch_img = self.highlighted_branch_img_tk if branch == self.highlighted_branch else self.branch_img_tk
 
-            # Draw the branch image
             self.canvas.create_image(branch["x"], branch["y"], anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch["birds"]):
                 if branch["x"] < 300:  # Left branches grow left-to-right
                     bird_x_offset = 10 + i * 35
-                    bird_image = self.bird_images[bird + "_flipped"]  # Use normal image
+                    bird_image = self.bird_images[bird + "_flipped"] 
                 else:  # Right branches grow right-to-left
                     bird_x_offset = 140 - i * 35 
                     bird_image = self.bird_images[bird] 
 
                 self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 35, anchor=tk.NW, image=bird_image)
 
-
         self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
-                              # 500, 50 se quiserem meter como estava originalmente :)
+
 
     def draw_background(self):
-        self.bg_image = ImageTk.PhotoImage(file="images/background.png")  # Load the background image
-        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)  # Draw it on the canvas
+        self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
+        self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)  
         
+
     def get_top_group(self, branch):
         if not branch["birds"]:
             return []
         
-        top_bird = branch["birds"][-1]  # The topmost bird
+        top_bird = branch["birds"][-1]  
         group = []
 
         for bird in reversed(branch["birds"]):  # Check from top to bottom
@@ -152,6 +168,7 @@ class BirdSortGame:
                 break
 
         return group
+
 
     def can_move(self, moving_birds, target_branch):
         if not moving_birds:
@@ -172,7 +189,7 @@ class BirdSortGame:
                 if self.selected_branch is None:
                     if branch["birds"]:
                         self.selected_branch = branch
-                        self.highlighted_branch = branch  # Highlight it
+                        self.highlighted_branch = branch  
                 else:
                     if self.selected_branch != branch:
                         if self.selected_branch["birds"]:
@@ -190,6 +207,7 @@ class BirdSortGame:
         self.draw_game()
         self.check_complete()
     
+
     def check_complete(self):
         new_branches = []
         for branch in self.branches:
@@ -204,15 +222,15 @@ class BirdSortGame:
         if self.is_game_won():
             self.show_win_popup()
 
+
     def is_game_won(self):
-        """Checks if all non-empty branches contain uniform colors."""
         for branch in self.branches:
             if branch["birds"] and (len(branch["birds"]) != 4 or len(set(branch["birds"])) != 1):
                 return False
         return True
 
+
     def show_win_popup(self):
-        """Displays the win message and a button to return to the main menu."""
         popup = tk.Toplevel(self.root)
         popup.title("Game Over")
         center_window(popup, 400, 200)
