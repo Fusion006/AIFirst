@@ -68,12 +68,26 @@ class BirdSortBFS:
         self.solution = None
         print(f"No solution found after {iterations} iterations.")
 
-    def is_solved(self, state):
-        return all(len(branch) == 0 or len(set(branch)) == 1 for branch in state)  # Each branch must have same color birds
+    def is_branch_complete(self, branch):
+        """Check if a branch has exactly 4 birds of the same color"""
+        return len(branch) == 4 and all(bird == branch[0] for bird in branch)
+
+    def eliminate_complete_branches(self, state):
+        """Remove complete branches from game state"""
+        new_state = []
+        for branch in state:
+            if not self.is_branch_complete(branch):
+                new_state.append(branch)
+            else:
+                new_state.append([])  # Replace complete branch with empty branch
+        return new_state
 
     def get_possible_moves(self, state):
         moves = []
         state = [list(branch) for branch in state]  # Convert to mutable lists
+        
+        # First eliminate any complete branches
+        state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
@@ -91,9 +105,16 @@ class BirdSortBFS:
                         birds_moving = new_state[i][-move_group:]  # Take the group
                         new_state[i] = new_state[i][:-move_group]  # Remove from source
                         new_state[j].extend(birds_moving)  # Add to destination
-                        moves.append((new_state, (i, j)))  
+                        
+                        # Check if the move created a complete branch
+                        new_state = self.eliminate_complete_branches(new_state)
+                        moves.append((new_state, (i, j)))
 
         return moves
+
+    def is_solved(self, state):
+        """Modified to consider empty branches as solved"""
+        return all(len(branch) == 0 for branch in state)
 
     def draw_state(self, state):
         self.game.canvas.delete("all")
