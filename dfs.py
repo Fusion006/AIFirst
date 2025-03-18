@@ -53,7 +53,8 @@ class BirdSortDFS:
             iterations += 1
 
             if self.is_solved(state):
-                self.solution = moves
+                self.solution = moves + [None]  # Append a None step to indicate the final state
+                self.final_state = copy.deepcopy(state)  # Store the final state separately
                 print(f"Solution found in {iterations} iterations!")
                 self.update_step_counter()
                 return
@@ -67,11 +68,29 @@ class BirdSortDFS:
         print(f"No solution found after {iterations} iterations.")
 
     def is_solved(self, state):
-        return all(len(branch) == 0 or len(set(branch)) == 1 for branch in state)  # Each branch must have same color birds
+        """Modified to consider empty branches as solved"""
+        return all(len(branch) == 0 for branch in state)
+
+    def is_branch_complete(self, branch):
+        """Check if a branch has exactly 4 birds of the same color"""
+        return len(branch) == 4 and all(bird == branch[0] for bird in branch)
+
+    def eliminate_complete_branches(self, state):
+        """Remove complete branches from game state"""
+        new_state = []
+        for branch in state:
+            if not self.is_branch_complete(branch):
+                new_state.append(branch)
+            else:
+                new_state.append([])  # Replace complete branch with empty branch
+        return new_state
 
     def get_possible_moves(self, state):
         moves = []
         state = [list(branch) for branch in state]  # Convert to mutable lists
+        
+        # First eliminate any complete branches
+        state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
@@ -80,7 +99,7 @@ class BirdSortDFS:
             bird_to_move = src[-1]
             move_group = 1
             while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
-                move_group += 1
+                move_group += 1  # Count consecutive birds of the same color
 
             for j, dst in enumerate(state):
                 if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
@@ -89,7 +108,10 @@ class BirdSortDFS:
                         birds_moving = new_state[i][-move_group:]  # Take the group
                         new_state[i] = new_state[i][:-move_group]  # Remove from source
                         new_state[j].extend(birds_moving)  # Add to destination
-                        moves.append((new_state, (i, j)))  
+                        
+                        # Check if the move created a complete branch
+                        new_state = self.eliminate_complete_branches(new_state)
+                        moves.append((new_state, (i, j)))
 
         return moves
 
@@ -119,7 +141,6 @@ class BirdSortDFS:
 
                 self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
 
-
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
@@ -131,21 +152,29 @@ class BirdSortDFS:
             self.rebuild_state(self.current_step)
 
     def rebuild_state(self, step):
-        current_state = copy.deepcopy(self.branches)
+        if step == len(self.solution):  
+            # If at the final step, just display the solved state
+            self.draw_state(self.final_state)
+        else:
+            current_state = copy.deepcopy(self.branches)
 
-        for i in range(step):
-            src_idx, dst_idx = self.solution[i]
+            for i in range(step):
+                src_idx, dst_idx = self.solution[i]
 
-            bird_to_move = current_state[src_idx][-1]
-            move_group = 1
-            while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
-                move_group += 1
+                bird_to_move = current_state[src_idx][-1]
+                move_group = 1
+                while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
+                    move_group += 1
 
-            birds_moving = current_state[src_idx][-move_group:]
-            current_state[src_idx] = current_state[src_idx][:-move_group]  
-            current_state[dst_idx].extend(birds_moving)
+                birds_moving = current_state[src_idx][-move_group:]
+                current_state[src_idx] = current_state[src_idx][:-move_group]
+                current_state[dst_idx].extend(birds_moving)
+                
+                # Check if the move created a complete branch
+                current_state = self.eliminate_complete_branches(current_state)
 
-        self.draw_state(current_state)
+            self.draw_state(current_state)
+
         self.update_step_counter()
 
     def update_step_counter(self):
