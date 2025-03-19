@@ -1,18 +1,18 @@
 import tkinter as tk
 import copy
-from collections import deque
+import heapq
 from game import BirdSortGame, center_window
 
-class BirdSortBFS:
+class BirdSortAStar:
     def __init__(self, root):
         self.root = root
-        self.root.title("Bird Sort BFS Solution")
+        self.root.title("Bird Sort A* Solution")
         center_window(self.root)
 
         self.game = BirdSortGame(root)
         self.game.root.unbind("<Button-1>")  # Disable manual play
 
-        self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
+        self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
         self.current_step = 0
 
@@ -36,16 +36,48 @@ class BirdSortBFS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    def heuristic(self, state):
+        """
+        Heuristic function for A* algorithm:
+        - Penalizes mixed colors in branches
+        - Rewards completed branches
+        - Considers number of moves needed to complete branches
+        """
+        score = 0
+        for branch in state:
+            if not branch:
+                continue
+            
+            # Penalize mixed colors in a branch
+            colors = set(branch)
+            if len(colors) > 1:
+                score += len(colors) * 2
+            
+            # Reward nearly complete branches
+            if len(colors) == 1:
+                score -= (len(branch) / 4) * 3
+                
+            # Penalize scattered same-color birds
+            for color in colors:
+                color_count = branch.count(color)
+                if color_count < 4:
+                    score += (4 - color_count)
+                    
+        return score
+
     def solve(self):
-        print("Starting BFS...")
-        queue = deque([(copy.deepcopy(self.branches), [])])
+        print("Starting A* search...")
+        start_state = copy.deepcopy(self.branches)
+        start_node = (0, 0, start_state, [])  # (f_score, node_count, state, moves)
         visited = set()
+        heap = [start_node]
+        node_count = 1
         max_iterations = 100000
         iterations = 0
 
-        while queue and iterations < max_iterations:
-            state, moves = queue.popleft()  # BFS -> FIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
+        while heap and iterations < max_iterations:
+            _, _, current_state, moves = heapq.heappop(heap)
+            state_tuple = tuple(tuple(branch) for branch in current_state)
 
             if state_tuple in visited:
                 continue
@@ -53,20 +85,28 @@ class BirdSortBFS:
             visited.add(state_tuple)
             iterations += 1
 
-            if self.is_solved(state):
-                self.solution = moves + [None]  # Append a None step to indicate the final state
-                self.final_state = copy.deepcopy(state)  # Store the final state separately
+            if self.is_solved(current_state):
+                self.solution = moves + [None]
+                self.final_state = copy.deepcopy(current_state)
                 print(f"Solution found in {iterations} iterations!")
                 self.update_step_counter()
                 return
 
-            for new_state, move in self.get_possible_moves(state):
-                new_state_tuple = tuple(tuple(branch) for branch in new_state)
-                if new_state_tuple not in visited:
-                    queue.append((new_state, moves + [move]))
+            for new_state, move in self.get_possible_moves(current_state):
+                if tuple(tuple(branch) for branch in new_state) not in visited:
+                    g_score = len(moves) + 1
+                    h_score = self.heuristic(new_state)
+                    f_score = g_score + h_score
+                    node_count += 1
+                    heapq.heappush(heap, (f_score, node_count, new_state, moves + [move]))
 
         self.solution = None
         print(f"No solution found after {iterations} iterations.")
+
+    # ... Rest of the methods are the same as in BFS/DFS ...
+    def is_solved(self, state):
+        """Modified to consider empty branches as solved"""
+        return all(len(branch) == 0 for branch in state)
 
     def is_branch_complete(self, branch):
         """Check if a branch has exactly 4 birds of the same color"""
@@ -79,42 +119,34 @@ class BirdSortBFS:
             if not self.is_branch_complete(branch):
                 new_state.append(branch)
             else:
-                new_state.append([])  # Replace complete branch with empty branch
+                new_state.append([])
         return new_state
 
     def get_possible_moves(self, state):
         moves = []
-        state = [list(branch) for branch in state]  # Convert to mutable lists
-        
-        # First eliminate any complete branches
+        state = [list(branch) for branch in state]
         state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
-                continue  # Skip empty branches
+                continue
 
             bird_to_move = src[-1]
             move_group = 1
             while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
-                move_group += 1  # Count consecutive birds of the same color
+                move_group += 1
 
             for j, dst in enumerate(state):
-                if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
+                if i != j and len(dst) + move_group <= 4:
                     if not dst or dst[-1] == bird_to_move:
-                        new_state = copy.deepcopy(state)  # Copy before modifying
-                        birds_moving = new_state[i][-move_group:]  # Take the group
-                        new_state[i] = new_state[i][:-move_group]  # Remove from source
-                        new_state[j].extend(birds_moving)  # Add to destination
-                        
-                        # Check if the move created a complete branch
+                        new_state = copy.deepcopy(state)
+                        birds_moving = new_state[i][-move_group:]
+                        new_state[i] = new_state[i][:-move_group]
+                        new_state[j].extend(birds_moving)
                         new_state = self.eliminate_complete_branches(new_state)
                         moves.append((new_state, (i, j)))
 
         return moves
-
-    def is_solved(self, state):
-        """Modified to consider empty branches as solved"""
-        return all(len(branch) == 0 for branch in state)
 
     def draw_state(self, state):
         self.game.canvas.delete("all")
@@ -123,20 +155,18 @@ class BirdSortBFS:
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
             
-            # Choose the correct branch image based on position
-            if x < 300:  # Left side
+            if x < 300:
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else:
                 branch_img = self.game.branch_img_tk
 
-            # Draw the branch
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
-                if x < 300:  # Left branches grow left-to-right
+                if x < 300:
                     bird_x_offset = 10 + i * 35
-                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
-                else:  # Right branches grow right-to-left
+                    bird_image = self.game.bird_images[bird + "_flipped"]
+                else:
                     bird_x_offset = 140 - i * 35
                     bird_image = self.game.bird_images[bird]
 
@@ -153,8 +183,7 @@ class BirdSortBFS:
             self.rebuild_state(self.current_step)
 
     def rebuild_state(self, step):
-        if step == len(self.solution):  
-            # If at the final step, just display the solved state
+        if step == len(self.solution):
             self.draw_state(self.final_state)
         else:
             current_state = copy.deepcopy(self.branches)
@@ -170,7 +199,6 @@ class BirdSortBFS:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                
                 current_state = self.eliminate_complete_branches(current_state)
 
             self.draw_state(current_state)
