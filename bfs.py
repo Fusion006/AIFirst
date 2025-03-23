@@ -2,26 +2,28 @@ import tkinter as tk
 import copy
 from collections import deque
 from game import BirdSortGame, center_window
+from difficulty_manager import get_difficulty_settings
 
 class BirdSortBFS:
-    def __init__(self, root):
+    def __init__(self, root, difficulty):
         self.root = root
         self.root.title("Bird Sort BFS Solution")
         center_window(self.root)
 
-        self.game = BirdSortGame(root)
+        self.difficulty = difficulty
+        self.create_controls()
+        self.game = BirdSortGame(root, difficulty)
         self.game.root.unbind("<Button-1>")  # Disable manual play
 
         self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
         self.solution = []
         self.current_step = 0
 
-        self.create_controls()
         self.solve()
 
     def create_controls(self):
-        control_frame = tk.Frame(self.root)
-        control_frame.pack(pady=10)
+        control_frame = tk.Frame(self.root, bg="lightgray")
+        control_frame.pack(side=tk.TOP, pady=10)
 
         self.step_label = tk.Label(control_frame, text="Step: 0/0", font=("Arial", 14))
         self.step_label.pack(side=tk.LEFT, padx=10)
@@ -32,6 +34,13 @@ class BirdSortBFS:
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
 
+        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Queue Size = 0", font=("Arial", 12))
+        self.stats_label.pack(pady=5)
+
+        self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))
+        self.game_info_label.pack(pady=5)
+        self.update_game_info()
+
         self.root.bind("<Left>", lambda e: self.previous_step())
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
@@ -40,10 +49,12 @@ class BirdSortBFS:
         print("Starting BFS...")
         queue = deque([(copy.deepcopy(self.branches), [])])
         visited = set()
-        max_iterations = 100000
+        max_iterations = 10000000
         iterations = 0
+        max_queue_size = 1
 
         while queue and iterations < max_iterations:
+            max_queue_size = max(max_queue_size, len(queue)) 
             state, moves = queue.popleft()  # BFS -> FIFO
             state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
 
@@ -56,8 +67,12 @@ class BirdSortBFS:
             if self.is_solved(state):
                 self.solution = moves + [None]  # Append a None step to indicate the final state
                 self.final_state = copy.deepcopy(state)  # Store the final state separately
+                self.total_moves = len(moves)  # Track solution length
+                self.states_explored = iterations
+                self.max_queue_size = max_queue_size 
                 print(f"Solution found in {iterations} iterations!")
                 self.update_step_counter()
+                self.update_stats_display()
                 return
 
             for new_state, move in self.get_possible_moves(state):
@@ -176,7 +191,40 @@ class BirdSortBFS:
             self.draw_state(current_state)
 
         self.update_step_counter()
+        self.update_stats_display()
 
     def update_step_counter(self):
         if self.solution:
             self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)}")
+
+    def update_stats_display(self):
+        if self.current_step == len(self.solution):
+            current_state = self.final_state
+        else:
+            current_state = copy.deepcopy(self.branches)
+            for i in range(self.current_step):
+                src_idx, dst_idx = self.solution[i]
+
+                bird_to_move = current_state[src_idx][-1]
+                move_group = 1
+                while move_group < len(current_state[src_idx]) and current_state[src_idx][-move_group - 1] == bird_to_move:
+                    move_group += 1
+
+                birds_moving = current_state[src_idx][-move_group:]
+                current_state[src_idx] = current_state[src_idx][:-move_group]
+                current_state[dst_idx].extend(birds_moving)
+                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+
+        empty_branches = sum(1 for branch in current_state if len(branch) == 0)
+        stats_text = (
+            f"Empty Branches = {empty_branches}, "
+            f"States Explored = {self.states_explored}, "
+            f"Max Queue Size = {self.max_queue_size}"
+        )
+        self.stats_label.config(text=stats_text)
+
+    def update_game_info(self):
+        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+
+        info_text = f"BFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        self.game_info_label.config(text=info_text)

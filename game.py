@@ -4,6 +4,7 @@ from PIL import Image, ImageTk
 from difficulty_manager import increase_difficulty
 from difficulty_manager import reset_difficulty
 from difficulty_manager import get_difficulty
+from difficulty_manager import get_difficulty_settings
 
 def center_window(root, width=600, height=800):
     screen_width = root.winfo_screenwidth()
@@ -13,28 +14,15 @@ def center_window(root, width=600, height=800):
     root.geometry(f"{width}x{height}+{x}+{y}")
 
 class BirdSortGame:
-    def __init__(self, root):
+    def __init__(self, root, difficulty=None):
         self.root = root
         self.root.title("Bird Sort Game")
-        self.difficulty = get_difficulty()
+        self.difficulty = difficulty if difficulty else get_difficulty()
+        human_game = False if difficulty else True
         center_window(self.root)
         
         self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
         self.canvas.pack()
-        
-        difficulty_settings = {
-            range(1, 5): (4, 6),
-            range(5, 10): (5, 8),
-            range(10, 15): (6, 9),
-            range(15, 20): (7, 10),
-            range(20, 25): (8, 12),
-            range(25, 30): (9, 13),
-        }
-        def get_difficulty_settings(difficulty):
-            for key, value in difficulty_settings.items():
-                if difficulty in key:
-                    return value
-            return (4, 6) 
     
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
@@ -60,13 +48,14 @@ class BirdSortGame:
             img = Image.open(f"images/{color}_bird.png").resize((50, 50), Image.Resampling.LANCZOS)  
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
-
+        
+        
         self.branches = []
         self.selected_branch = None
         self.highlighted_branch = None
         self.score = 100
         self.init_branches(num_branches)
-        self.draw_game()
+        self.draw_game(human_game)
         self.create_back_button()
         
         self.root.bind("<Button-1>", self.on_click)
@@ -150,7 +139,7 @@ class BirdSortGame:
         return False
 
     
-    def draw_game(self):
+    def draw_game(self, human_game):
         self.canvas.delete("all")
         self.draw_background()
         
@@ -169,8 +158,9 @@ class BirdSortGame:
                 bird_image = self.bird_images[bird + "_flipped"] if branch["x"] < 300 else self.bird_images[bird]
                 self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 35, anchor=tk.NW, image=bird_image)
 
-        self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
-        self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Arial", 14), fill="black")
+        if human_game:
+            self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
+            self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Arial", 14), fill="black")
 
     def draw_background(self):
         self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
@@ -229,7 +219,7 @@ class BirdSortGame:
                         self.highlighted_branch = None  # Remove highlight after move
                 break
 
-        self.draw_game()
+        self.draw_game(True)
         self.check_complete()
     
 
@@ -242,7 +232,7 @@ class BirdSortGame:
                 new_branches.append(branch)
         self.branches = new_branches
 
-        self.draw_game()
+        self.draw_game(True)
 
         if self.is_game_won():
             self.show_win_popup()
@@ -285,7 +275,7 @@ class BirdSortGame:
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))
 
         self.init_branches(num_branches)  # Pass the calculated number of branches
-        self.draw_game()
+        self.draw_game(True)
 
 
     def show_win_popup(self):

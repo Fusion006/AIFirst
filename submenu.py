@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, messagebox
+from tkinter import Tk, Label, Button, messagebox, simpledialog
 from game import center_window
 from game import BirdSortGame
 from bfs import BirdSortBFS 
@@ -25,41 +25,24 @@ class AiSubmenu:
             root = Tk()
             MainMenu(root)
             root.mainloop()
-        elif option == "BFS":
-            self.start_bfs_ai()
-        elif option == "DFS":
-            self.start_dfs_ai()
-        elif option == "A*":
-            self.start_astar_ai()
-        elif option == "IDS":
-            self.start_ids_ai()
         else:
-            messagebox.showinfo("AI Mode", f"Selected AI: {option}")
+            difficulty = simpledialog.askinteger("Select Difficulty", "Enter difficulty level (1-19):", minvalue=1, maxvalue=19)
+            if difficulty:
+                self.start_ai(option, difficulty)
 
-    def start_bfs_ai(self):
-        print("Initializing BFS AI...")
+    def start_ai(self, algorithm, difficulty):
         self.root.destroy()
         game_root = Tk()
-        BirdSortBFS(game_root)
-        game_root.mainloop()
-    
-    def start_dfs_ai(self):
-        print("Initializing DFS AI...")
-        self.root.destroy()
-        game_root = Tk()
-        BirdSortDFS(game_root)
-        game_root.mainloop()
-    
-    def start_ids_ai(self):
-        print("Initializing IDS AI...")
-        self.root.destroy()
-        game_root = Tk()
-        BirdSortIDS(game_root)
-        game_root.mainloop()
-    
-    def start_astar_ai(self):
-        print("Initializing A* AI...")
-        self.root.destroy()
-        game_root = Tk()
-        BirdSortAStar(game_root)
+        
+        if algorithm == "BFS":
+            BirdSortBFS(game_root, difficulty)
+        elif algorithm == "DFS":
+            BirdSortDFS(game_root, difficulty)
+        elif algorithm == "A*":
+            BirdSortAStar(game_root, difficulty)
+        elif algorithm == "IDS":
+            BirdSortIDS(game_root, difficulty)
+        else:
+            messagebox.showinfo("AI Mode", f"Selected AI: {algorithm}")
+        
         game_root.mainloop()
