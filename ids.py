@@ -1,17 +1,17 @@
 import tkinter as tk
-from game import BirdSortGame, center_window
 import copy
+from game import BirdSortGame, center_window
 
-class BirdSortDFS:
+class BirdSortIDS:
     def __init__(self, root):
         self.root = root
-        self.root.title("Bird Sort DFS Solution")
+        self.root.title("Bird Sort IDS Solution")
         center_window(self.root)
 
         self.game = BirdSortGame(root)
         self.game.root.unbind("<Button-1>")  # Disable manual play
 
-        self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
+        self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
         self.current_step = 0
 
@@ -35,37 +35,70 @@ class BirdSortDFS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    def dls(self, state, depth, max_depth, moves, visited):
+        """Depth-limited search helper function"""
+        if depth > max_depth:
+            return None
+
+        state_tuple = tuple(tuple(branch) for branch in state)
+        if state_tuple in visited:
+            return None
+
+        visited.add(state_tuple)
+
+        if self.is_solved(state):
+            return moves
+
+        if depth == max_depth:
+            return None
+
+        for new_state, move in self.get_possible_moves(state):
+            new_state_tuple = tuple(tuple(branch) for branch in new_state)
+            if new_state_tuple not in visited:
+                result = self.dls(new_state, depth + 1, max_depth, moves + [move], visited)
+                if result is not None:
+                    return result
+
+        return None
+
     def solve(self):
-        print("Starting DFS...")
-        stack = [(copy.deepcopy(self.branches), [])]
-        visited = set()
-        max_iterations = 100000
+        print("Starting IDS...")
+        max_depth = 1
+        max_iterations = 100
         iterations = 0
 
-        while stack and iterations < max_iterations:
-            state, moves = stack.pop()  # DFS -> LIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
-
-            if state_tuple in visited:
-                continue
-
-            visited.add(state_tuple)
-            iterations += 1
-
-            if self.is_solved(state):
-                self.solution = moves + [None]  # Append a None step to indicate the final state
-                self.final_state = copy.deepcopy(state)  # Store the final state separately
-                print(f"Solution found in {iterations} iterations!")
+        while iterations < max_iterations:
+            print(f"Trying depth limit: {max_depth}")
+            visited = set()
+            result = self.dls(copy.deepcopy(self.branches), 0, max_depth, [], visited)
+            
+            if result is not None:
+                self.solution = result + [None]  # Append None for final state
+                self.final_state = self.get_final_state(result)
+                print(f"Solution found at depth {max_depth}!")
                 self.update_step_counter()
                 return
-
-            for new_state, move in self.get_possible_moves(state):
-                new_state_tuple = tuple(tuple(branch) for branch in new_state)
-                if new_state_tuple not in visited:
-                    stack.append((new_state, moves + [move]))
+                
+            max_depth += 1
+            iterations += 1
 
         self.solution = None
-        print(f"No solution found after {iterations} iterations.")
+        print(f"No solution found within {max_iterations} depth iterations.")
+
+    def get_final_state(self, moves):
+        """Reconstruct final state from moves"""
+        state = copy.deepcopy(self.branches)
+        for src_idx, dst_idx in moves:
+            bird_to_move = state[src_idx][-1]
+            move_group = 1
+            while move_group < len(state[src_idx]) and state[src_idx][-move_group - 1] == bird_to_move:
+                move_group += 1
+
+            birds_moving = state[src_idx][-move_group:]
+            state[src_idx] = state[src_idx][:-move_group]
+            state[dst_idx].extend(birds_moving)
+            state = self.eliminate_complete_branches(state)
+        return state
 
     def is_solved(self, state):
         """Modified to consider empty branches as solved"""
@@ -84,7 +117,7 @@ class BirdSortDFS:
             else:
                 new_state.append([])  # Replace complete branch with empty branch
         return new_state
-
+    
     def get_possible_moves(self, state):
         moves = []
         state = [list(branch) for branch in state]  # Convert to mutable lists
@@ -114,7 +147,7 @@ class BirdSortDFS:
                         moves.append((new_state, (i, j)))
 
         return moves
-
+    
     def draw_state(self, state):
         self.game.canvas.delete("all")
         self.game.draw_background()
@@ -140,7 +173,7 @@ class BirdSortDFS:
                     bird_image = self.game.bird_images[bird]
 
                 self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
-
+    
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
@@ -170,7 +203,6 @@ class BirdSortDFS:
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
                 
-                # Check if the move created a complete branch
                 current_state = self.eliminate_complete_branches(current_state)
 
             self.draw_state(current_state)
@@ -180,3 +212,4 @@ class BirdSortDFS:
     def update_step_counter(self):
         if self.solution:
             self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)}")
+    # ... Rest of the methods (get_possible_moves, draw_state, etc.) are the same as in BFS/DFS ...

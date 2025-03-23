@@ -1,6 +1,5 @@
 from tkinter import Tk, Label, Button
 from game import BirdSortGame, center_window
-from difficulty_manager import difficulty_level
 
 class MainMenu:
     def __init__(self, root):
@@ -8,7 +7,7 @@ class MainMenu:
         self.root.title("Main Menu")
         center_window(self.root)
         
-        from difficulty_manager import difficulty_level
+        from difficulty_manager import difficulty_level # type: ignore
         self.difficulty = difficulty_level
 
         Label(root, text="Bird Sort Game", font=("Arial", 24)).pack(pady=50)
