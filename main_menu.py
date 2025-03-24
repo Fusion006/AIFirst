@@ -13,6 +13,9 @@ class MainMenu:
         image = Image.open("images/bkg.png")  # Ensure this path is correct
         self.bg_image = ImageTk.PhotoImage(image) # Replace with your image
         
+        from difficulty_manager import difficulty_level # type: ignore
+        self.difficulty = difficulty_level
+        
         # Create Canvas for background
         self.canvas = tk.Canvas(root, width=600, height=800)
         self.canvas.pack(fill="both", expand=True)

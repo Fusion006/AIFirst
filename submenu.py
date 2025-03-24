@@ -1,8 +1,12 @@
-from tkinter import Tk, Label, Button, messagebox
+from tkinter import Tk, Label, Button, messagebox, simpledialog
 from game import center_window
 from game import BirdSortGame
 from bfs import BirdSortBFS 
 from dfs import BirdSortDFS
+from a_star import BirdSortAStar 
+from ids import BirdSortIDS 
+from monte_carlo import BirdSortMonteCarlo #type:ignore
+from greedy import BirdSortGreedy #type:ignore
 
 class AiSubmenu:
     def __init__(self, root):
@@ -12,7 +16,7 @@ class AiSubmenu:
         
         Label(root, text="Select AI Algorithm", font=("Arial", 20)).pack(pady=50)
         
-        options = ["DFS", "BFS", "ITERATIVE DEEPENING", "GREEDY SEARCH", "A*", "Back to Main Menu"]
+        options = ["DFS", "BFS", "IDS", "GREEDY SEARCH", "A*", "MONTE CARLO TREE SEARCH", "Back to Main Menu"]
         for option in options:
             Button(root, text=option, font=("Arial", 16), command=lambda opt=option: self.select_option(opt)).pack(pady=10)
     
@@ -23,23 +27,28 @@ class AiSubmenu:
             root = Tk()
             MainMenu(root)
             root.mainloop()
-        elif option == "BFS":
-            self.start_bfs_ai()
-        elif option == "DFS":
-            self.start_dfs_ai()
         else:
-            messagebox.showinfo("AI Mode", f"Selected AI: {option}")
+            difficulty = simpledialog.askinteger("Select Difficulty", "Enter difficulty level (1-19):", minvalue=1, maxvalue=19)
+            if difficulty:
+                self.start_ai(option, difficulty)
 
-    def start_bfs_ai(self):
-        print("Initializing BFS AI...")
+    def start_ai(self, algorithm, difficulty):
         self.root.destroy()
         game_root = Tk()
-        BirdSortBFS(game_root)
-        game_root.mainloop()
-    
-    def start_dfs_ai(self):
-        print("Initializing DFS AI...")
-        self.root.destroy()
-        game_root = Tk()
-        BirdSortDFS(game_root)
+        
+        if algorithm == "BFS":
+            BirdSortBFS(game_root, difficulty)
+        elif algorithm == "DFS":
+            BirdSortDFS(game_root, difficulty)
+        elif algorithm == "A*":
+            BirdSortAStar(game_root, difficulty)
+        elif algorithm == "IDS":
+            BirdSortIDS(game_root, difficulty)
+        elif algorithm == "GREEDY SEARCH":
+            BirdSortGreedy(game_root, difficulty)
+        elif algorithm == "MONTE CARLO TREE SEARCH":
+            BirdSortMonteCarlo(game_root, difficulty)
+        else:
+            messagebox.showinfo("AI Mode", f"Selected AI: {algorithm}")
+        
         game_root.mainloop()

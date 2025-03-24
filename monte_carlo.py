@@ -1,14 +1,14 @@
 import tkinter as tk
 import copy
 import time
-from collections import deque
+import random
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 
-class BirdSortBFS:
+class BirdSortMonteCarlo:
     def __init__(self, root, difficulty):
         self.root = root
-        self.root.title("Bird Sort BFS Solution")
+        self.root.title("Bird Sort Monte Carlo Solution")
         center_window(self.root)
 
         self.difficulty = difficulty
@@ -16,7 +16,7 @@ class BirdSortBFS:
         self.game = BirdSortGame(root, difficulty)
         self.game.root.unbind("<Button-1>")  # Disable manual play
 
-        self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
+        self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
         self.current_step = 0
 
@@ -48,45 +48,74 @@ class BirdSortBFS:
         self.root.bind("<space>", lambda e: self.next_step())
 
     def solve(self):
-        print("Starting BFS...")
-        queue = deque([(copy.deepcopy(self.branches), [])])
-        visited = set()
-        max_iterations = 10000000
-        iterations = 0
-        max_queue_size = 1
+        print("Starting Monte Carlo search...")
         start_time = time.perf_counter()
+        max_iterations = 100000
+        iterations = 0
+        best_solution = None
+        best_score = float('inf')
 
-        while queue and iterations < max_iterations:
-            max_queue_size = max(max_queue_size, len(queue)) 
-            state, moves = queue.popleft()  # BFS -> FIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
+        while iterations < max_iterations:
+            state = copy.deepcopy(self.branches)
+            moves = []
+            score = 0
 
-            if state_tuple in visited:
-                continue
+            while not self.is_solved(state) and score < best_score:
+                possible_moves = self.get_possible_moves(state)
+                if not possible_moves:
+                    break
 
-            visited.add(state_tuple)
+                move = random.choice(possible_moves)
+                state, move_coords = move
+                moves.append(move_coords)
+                score += self.heuristic(state)
+
+            if self.is_solved(state) and score < best_score:
+                best_solution = moves
+                best_score = score
+
             iterations += 1
 
-            if self.is_solved(state):
-                end_time = time.perf_counter()
-                self.elapsed_time = end_time - start_time
-                self.solution = moves + [None]  # Append a None step to indicate the final state
-                self.final_state = copy.deepcopy(state)  # Store the final state separately
-                self.total_moves = len(moves)  # Track solution length
-                self.states_explored = iterations
-                self.max_queue_size = max_queue_size 
-                print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
-                self.update_step_counter()
-                self.update_stats_display()
-                return
+        end_time = time.perf_counter()
+        self.elapsed_time = end_time - start_time
+        self.solution = best_solution + [None] if best_solution else None
+        self.final_state = copy.deepcopy(state) if best_solution else None
+        self.total_moves = len(best_solution) if best_solution else 0
+        self.states_explored = iterations
+        self.max_queue_size = 0  # Not applicable for Monte Carlo
 
-            for new_state, move in self.get_possible_moves(state):
-                new_state_tuple = tuple(tuple(branch) for branch in new_state)
-                if new_state_tuple not in visited:
-                    queue.append((new_state, moves + [move]))
+        if best_solution:
+            print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
+        else:
+            print(f"No solution found after {iterations} iterations.")
 
-        self.solution = None
-        print(f"No solution found after {iterations} iterations.")
+        self.update_step_counter()
+        self.update_stats_display()
+
+    def heuristic(self, state):
+        """Heuristic function to evaluate the state"""
+        score = 0
+        for branch in state:
+            if not branch:
+                continue
+
+            colors = set(branch)
+            if len(colors) > 1:
+                score += len(colors) * 2
+
+            if len(colors) == 1:
+                score -= (len(branch) / 4) * 3
+
+            for color in colors:
+                color_count = branch.count(color)
+                if color_count < 4:
+                    score += (4 - color_count)
+
+        return score
+
+    def is_solved(self, state):
+        """Modified to consider empty branches as solved"""
+        return all(len(branch) == 0 for branch in state)
 
     def is_branch_complete(self, branch):
         """Check if a branch has exactly 4 birds of the same color"""
@@ -99,42 +128,34 @@ class BirdSortBFS:
             if not self.is_branch_complete(branch):
                 new_state.append(branch)
             else:
-                new_state.append([])  # Replace complete branch with empty branch
+                new_state.append([])
         return new_state
 
     def get_possible_moves(self, state):
         moves = []
-        state = [list(branch) for branch in state]  # Convert to mutable lists
-        
-        # First eliminate any complete branches
+        state = [list(branch) for branch in state]
         state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
-                continue  # Skip empty branches
+                continue
 
             bird_to_move = src[-1]
             move_group = 1
             while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
-                move_group += 1  # Count consecutive birds of the same color
+                move_group += 1
 
             for j, dst in enumerate(state):
-                if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
+                if i != j and len(dst) + move_group <= 4:
                     if not dst or dst[-1] == bird_to_move:
-                        new_state = copy.deepcopy(state)  # Copy before modifying
-                        birds_moving = new_state[i][-move_group:]  # Take the group
-                        new_state[i] = new_state[i][:-move_group]  # Remove from source
-                        new_state[j].extend(birds_moving)  # Add to destination
-                        
-                        # Check if the move created a complete branch
+                        new_state = copy.deepcopy(state)
+                        birds_moving = new_state[i][-move_group:]
+                        new_state[i] = new_state[i][:-move_group]
+                        new_state[j].extend(birds_moving)
                         new_state = self.eliminate_complete_branches(new_state)
                         moves.append((new_state, (i, j)))
 
         return moves
-
-    def is_solved(self, state):
-        """Modified to consider empty branches as solved"""
-        return all(len(branch) == 0 for branch in state)
 
     def draw_state(self, state):
         self.game.canvas.delete("all")
@@ -142,21 +163,19 @@ class BirdSortBFS:
 
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
-            
-            # Choose the correct branch image based on position
-            if x < 300:  # Left side
+
+            if x < 300:
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else:
                 branch_img = self.game.branch_img_tk
 
-            # Draw the branch
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
-                if x < 300:  # Left branches grow left-to-right
+                if x < 300:
                     bird_x_offset = 10 + i * 35
-                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
-                else:  # Right branches grow right-to-left
+                    bird_image = self.game.bird_images[bird + "_flipped"]
+                else:
                     bird_x_offset = 140 - i * 35
                     bird_image = self.game.bird_images[bird]
 
@@ -173,8 +192,7 @@ class BirdSortBFS:
             self.rebuild_state(self.current_step)
 
     def rebuild_state(self, step):
-        if step == len(self.solution):  
-            # If at the final step, just display the solved state
+        if step == len(self.solution):
             self.draw_state(self.final_state)
         else:
             current_state = copy.deepcopy(self.branches)
@@ -190,7 +208,6 @@ class BirdSortBFS:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                
                 current_state = self.eliminate_complete_branches(current_state)
 
             self.draw_state(current_state)
@@ -218,7 +235,7 @@ class BirdSortBFS:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+                current_state = self.eliminate_complete_branches(current_state)
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
@@ -229,7 +246,7 @@ class BirdSortBFS:
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+        num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
-        info_text = f"BFS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: Monte Carlo, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)

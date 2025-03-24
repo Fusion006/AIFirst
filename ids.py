@@ -1,14 +1,13 @@
 import tkinter as tk
 import copy
 import time
-from collections import deque
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 
-class BirdSortBFS:
+class BirdSortIDS:
     def __init__(self, root, difficulty):
         self.root = root
-        self.root.title("Bird Sort BFS Solution")
+        self.root.title("Bird Sort IDS Solution")
         center_window(self.root)
 
         self.difficulty = difficulty
@@ -16,7 +15,7 @@ class BirdSortBFS:
         self.game = BirdSortGame(root, difficulty)
         self.game.root.unbind("<Button-1>")  # Disable manual play
 
-        self.branches = [list(branch["birds"]) for branch in self.game.branches]  # Start with mutable lists
+        self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
         self.current_step = 0
 
@@ -35,7 +34,7 @@ class BirdSortBFS:
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
 
-        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Queue Size = 0", font=("Arial", 12))
+        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Nodes Generated = 0", font=("Arial", 12))
         self.stats_label.pack(pady=5)
 
         self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))
@@ -47,46 +46,81 @@ class BirdSortBFS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    def dls(self, state, depth, max_depth, moves, visited, total_nodes_generated):
+        """Depth-limited search helper function"""
+        if depth > max_depth:
+            return None
+
+        state_tuple = tuple(tuple(branch) for branch in state)
+        if state_tuple in visited:
+            return None
+
+        visited.add(state_tuple)
+
+        total_nodes_generated[0] += 1 
+
+        if self.is_solved(state):
+            return moves
+
+        if depth == max_depth:
+            return None
+
+        for new_state, move in self.get_possible_moves(state):
+            new_state_tuple = tuple(tuple(branch) for branch in new_state)
+            if new_state_tuple not in visited:
+                result = self.dls(new_state, depth + 1, max_depth, moves + [move], visited, total_nodes_generated)
+                if result is not None:
+                    return result
+
+        return None
+
     def solve(self):
-        print("Starting BFS...")
-        queue = deque([(copy.deepcopy(self.branches), [])])
-        visited = set()
-        max_iterations = 10000000
+        print("Starting IDS...")
+        max_depth = 1
+        max_iterations = 10000
         iterations = 0
-        max_queue_size = 1
-        start_time = time.perf_counter()
+        total_nodes_generated = [0]
 
-        while queue and iterations < max_iterations:
-            max_queue_size = max(max_queue_size, len(queue)) 
-            state, moves = queue.popleft()  # BFS -> FIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
-
-            if state_tuple in visited:
-                continue
-
-            visited.add(state_tuple)
-            iterations += 1
-
-            if self.is_solved(state):
-                end_time = time.perf_counter()
-                self.elapsed_time = end_time - start_time
-                self.solution = moves + [None]  # Append a None step to indicate the final state
-                self.final_state = copy.deepcopy(state)  # Store the final state separately
-                self.total_moves = len(moves)  # Track solution length
+        while iterations < max_iterations:
+            print(f"Trying depth limit: {max_depth}")
+            visited = set()
+            result = self.dls(copy.deepcopy(self.branches), 0, max_depth, [], visited, total_nodes_generated)
+            
+            if result is not None:
+                self.solution = result + [None]  # Append None for final state
+                self.final_state = self.get_final_state(result)
                 self.states_explored = iterations
-                self.max_queue_size = max_queue_size 
-                print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
+                self.depth_limit = max_depth
+                self.nodes_generated = total_nodes_generated[0]  # Store final nodes generated count
+                print(f"Solution found at depth {max_depth}!")
                 self.update_step_counter()
                 self.update_stats_display()
                 return
-
-            for new_state, move in self.get_possible_moves(state):
-                new_state_tuple = tuple(tuple(branch) for branch in new_state)
-                if new_state_tuple not in visited:
-                    queue.append((new_state, moves + [move]))
+            
+            max_depth += 1
+            iterations += 1
 
         self.solution = None
-        print(f"No solution found after {iterations} iterations.")
+        print(f"No solution found within {max_iterations} depth iterations.")
+
+    def get_final_state(self, moves):
+        """Reconstruct final state from moves"""
+        state = copy.deepcopy(self.branches)
+        for src_idx, dst_idx in moves:
+            bird_to_move = state[src_idx][-1]
+            move_group = 1
+            while move_group < len(state[src_idx]) and state[src_idx][-move_group - 1] == bird_to_move:
+                move_group += 1
+
+            birds_moving = state[src_idx][-move_group:]
+            state[src_idx] = state[src_idx][:-move_group]
+            state[dst_idx].extend(birds_moving)
+            state = self.eliminate_complete_branches(state)
+        return state
+
+    def is_solved(self, state):
+        """Modified to consider empty branches as solved"""
+        return all(len(branch) == 0 for branch in state)
 
     def is_branch_complete(self, branch):
         """Check if a branch has exactly 4 birds of the same color"""
@@ -101,7 +135,7 @@ class BirdSortBFS:
             else:
                 new_state.append([])  # Replace complete branch with empty branch
         return new_state
-
+    
     def get_possible_moves(self, state):
         moves = []
         state = [list(branch) for branch in state]  # Convert to mutable lists
@@ -131,11 +165,7 @@ class BirdSortBFS:
                         moves.append((new_state, (i, j)))
 
         return moves
-
-    def is_solved(self, state):
-        """Modified to consider empty branches as solved"""
-        return all(len(branch) == 0 for branch in state)
-
+    
     def draw_state(self, state):
         self.game.canvas.delete("all")
         self.game.draw_background()
@@ -161,7 +191,7 @@ class BirdSortBFS:
                     bird_image = self.game.bird_images[bird]
 
                 self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
-
+    
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
@@ -196,7 +226,7 @@ class BirdSortBFS:
             self.draw_state(current_state)
 
         self.update_step_counter()
-        self.update_stats_display()
+        self.update_game_info()
 
     def update_step_counter(self):
         if self.solution:
@@ -223,13 +253,13 @@ class BirdSortBFS:
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
             f"Empty Branches = {empty_branches}, "
-            f"States Explored = {self.states_explored}, "
-            f"Max Queue Size = {self.max_queue_size}"
+            f"Depth Limit = {self.depth_limit}, "
+            f"Nodes Generated = {self.nodes_generated}"
         )
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"BFS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: IDS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
