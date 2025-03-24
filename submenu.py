@@ -3,8 +3,10 @@ from game import center_window
 from game import BirdSortGame
 from bfs import BirdSortBFS 
 from dfs import BirdSortDFS
-from a_star import BirdSortAStar # type: ignore
-from ids import BirdSortIDS  # type: ignore
+from a_star import BirdSortAStar 
+from ids import BirdSortIDS 
+from monte_carlo import BirdSortMonteCarlo #type:ignore
+from greedy import BirdSortGreedy #type:ignore
 
 class AiSubmenu:
     def __init__(self, root):
@@ -42,6 +44,10 @@ class AiSubmenu:
             BirdSortAStar(game_root, difficulty)
         elif algorithm == "IDS":
             BirdSortIDS(game_root, difficulty)
+        elif algorithm == "GREEDY SEARCH":
+            BirdSortGreedy(game_root, difficulty)
+        elif algorithm == "MONTE CARLO TREE SEARCH":
+            BirdSortMonteCarlo(game_root, difficulty)
         else:
             messagebox.showinfo("AI Mode", f"Selected AI: {algorithm}")
         
