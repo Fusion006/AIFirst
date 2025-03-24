@@ -1,18 +1,47 @@
-from tkinter import Tk, Label, Button
-from game import BirdSortGame, center_window
+from tkinter import Tk, Label, Button, Canvas, font
+from game import BirdSortGame
+import tkinter as tk
+from PIL import Image, ImageTk
 
 class MainMenu:
     def __init__(self, root):
         self.root = root
         self.root.title("Main Menu")
-        center_window(self.root)
+        self.root.geometry("600x800")
         
-        Label(root, text="Bird Sort Game", font=("Arial", 24)).pack(pady=50)
+        # Load background image
+        image = Image.open("images/bkg.png")  # Ensure this path is correct
+        self.bg_image = ImageTk.PhotoImage(image) # Replace with your image
         
-        Button(root, text="Play (Human)", font=("Arial", 16), command=self.start_game).pack(pady=10)
-        Button(root, text="Play (AI)", font=("Arial", 16), command=self.open_ai_submenu).pack(pady=10)
-        Button(root, text="Quit", font=("Arial", 16), command=root.quit).pack(pady=10)
+        # Create Canvas for background
+        self.canvas = tk.Canvas(root, width=600, height=800)
+        self.canvas.pack(fill="both", expand=True)
+        self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
+
+        # Create styled buttons
+        self.create_rounded_button(300, 380, "Play (Human)", "#86a340", self.start_game)
+        self.create_rounded_button(300, 480, "Play (AI)", "#5a7547", self.open_ai_submenu)
+        self.create_rounded_button(300, 580, "Quit", "#fbc182", self.root.quit)
     
+    def create_rounded_button(self, x, y, text, color, command):
+        fontezinho = font.Font(family="Trebuchet MS", size=17, weight="bold")
+
+        # Create button with no border and ridge relief
+        btn = tk.Button(self.root, text=text, font=fontezinho,
+                        bg=color, fg="white",
+                        activebackground=self.lighten_color(color),  # Prevents gray hover effect
+                        activeforeground="white",  # Keeps text white when hovered
+                        borderwidth=3, relief="raised",  # Ridge effect
+                        command=command)
+        
+        # Place button properly in the window
+        btn.place(x=x - 100, y=y - 25, width=200, height=50)
+
+    def lighten_color(self, color, factor=30):
+        """Lightens the given color slightly."""
+        r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
+        return f'#{min(r+factor, 255):02x}{min(g+factor, 255):02x}{min(b+factor, 255):02x}'
+
     def start_game(self):
         self.root.destroy()
         root = Tk()
