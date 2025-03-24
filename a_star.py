@@ -40,6 +40,7 @@ class BirdSortAStar:
 
         self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))
         self.game_info_label.pack(pady=5)
+        self.elapsed_time = 0
         self.update_game_info()
 
         self.root.bind("<Left>", lambda e: self.previous_step())
