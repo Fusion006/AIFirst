@@ -1,5 +1,6 @@
 import tkinter as tk
 import copy
+import time
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 
@@ -260,5 +261,5 @@ class BirdSortIDS:
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"Algorithm: IDS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: IDS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
