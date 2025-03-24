@@ -80,6 +80,7 @@ class BirdSortIDS:
         max_iterations = 10000
         iterations = 0
         total_nodes_generated = [0]
+        start_time = time.perf_counter()
 
         while iterations < max_iterations:
             print(f"Trying depth limit: {max_depth}")
@@ -87,6 +88,8 @@ class BirdSortIDS:
             result = self.dls(copy.deepcopy(self.branches), 0, max_depth, [], visited, total_nodes_generated)
             
             if result is not None:
+                end_time = time.perf_counter()
+                self.elapsed_time = end_time - start_time
                 self.solution = result + [None]  # Append None for final state
                 self.final_state = self.get_final_state(result)
                 self.states_explored = iterations
@@ -253,14 +256,15 @@ class BirdSortIDS:
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
-            f"Empty Branches = {empty_branches}, "
-            f"Depth Limit = {self.depth_limit}, "
-            f"Nodes Generated = {self.nodes_generated}"
+            f"Time: {self.elapsed_time:.3f}s, "
+            f"Empty Branches: {empty_branches}, "
+            f"Depth Limit: {self.depth_limit}, "
+            f"Nodes Generated: {self.nodes_generated}"
         )
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"Algorithm: IDS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: IDS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)

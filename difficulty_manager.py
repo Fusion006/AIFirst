@@ -32,3 +32,9 @@ def get_difficulty_settings(difficulty):
         if difficulty in key:
             return value
     return (4, 6) 
+
+"""
+White
+Cyan
+Brown
+"""

@@ -26,7 +26,7 @@ class AiSubmenu:
             MainMenu(root)
             root.mainloop()
         else:
-            difficulty = simpledialog.askinteger("Select Difficulty", "Enter difficulty level (1-19):", minvalue=1, maxvalue=19)
+            difficulty = simpledialog.askinteger("Select Difficulty", "Enter difficulty level (1-999):", minvalue=1, maxvalue=999)
             if difficulty:
                 self.start_ai(option, difficulty)
 

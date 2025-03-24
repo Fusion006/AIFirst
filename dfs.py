@@ -223,14 +223,15 @@ class BirdSortDFS:
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
-            f"Empty Branches = {empty_branches}, "
-            f"States Explored = {self.states_explored}, "
-            f"Max Depth = {self.max_queue_size}"
+            f"Time: {self.elapsed_time:.3f}s, "
+            f"Empty Branches: {empty_branches}, "
+            f"States Explored: {self.states_explored}, "
+            f"Max Depth: {self.max_queue_size}"
         )
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"DFS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"DFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
