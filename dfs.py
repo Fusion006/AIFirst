@@ -2,6 +2,7 @@ import tkinter as tk
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 import copy
+import time
 
 class BirdSortDFS:
     def __init__(self, root, difficulty):
@@ -51,6 +52,7 @@ class BirdSortDFS:
         max_iterations = 10000000
         iterations = 0
         max_depth = 0
+        start_time = time.perf_counter()
 
         while stack and iterations < max_iterations:
             # max_queue_size = max(max_queue_size, len(heap)) this but for max_depth
@@ -65,12 +67,14 @@ class BirdSortDFS:
             max_depth = max(max_depth, depth)
 
             if self.is_solved(state):
+                end_time = time.perf_counter()
+                self.elapsed_time = end_time - start_time
                 self.solution = moves + [None]  # Append a None step to indicate the final state
                 self.final_state = copy.deepcopy(state)  # Store the final state separately
                 self.total_moves = len(moves)  # Track solution length
                 self.states_explored = iterations
                 self.max_queue_size = max_depth  # Store final max depth
-                print(f"Solution found in {iterations} iterations! Max Depth: {max_depth}")
+                print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!! Max Depth: {max_depth}")
                 self.update_step_counter()
                 self.update_stats_display()
                 return
@@ -227,5 +231,5 @@ class BirdSortDFS:
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"DFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"DFS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)

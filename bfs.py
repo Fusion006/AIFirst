@@ -1,5 +1,6 @@
 import tkinter as tk
 import copy
+import time
 from collections import deque
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
@@ -52,6 +53,7 @@ class BirdSortBFS:
         max_iterations = 10000000
         iterations = 0
         max_queue_size = 1
+        start_time = time.perf_counter()
 
         while queue and iterations < max_iterations:
             max_queue_size = max(max_queue_size, len(queue)) 
@@ -65,12 +67,14 @@ class BirdSortBFS:
             iterations += 1
 
             if self.is_solved(state):
+                end_time = time.perf_counter()
+                self.elapsed_time = end_time - start_time
                 self.solution = moves + [None]  # Append a None step to indicate the final state
                 self.final_state = copy.deepcopy(state)  # Store the final state separately
                 self.total_moves = len(moves)  # Track solution length
                 self.states_explored = iterations
                 self.max_queue_size = max_queue_size 
-                print(f"Solution found in {iterations} iterations!")
+                print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
                 self.update_step_counter()
                 self.update_stats_display()
                 return
@@ -226,5 +230,5 @@ class BirdSortBFS:
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
 
-        info_text = f"BFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"BFS, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
