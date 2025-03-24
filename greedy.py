@@ -4,10 +4,10 @@ import time
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 
-class BirdSortIDS:
+class BirdSortGreedy:
     def __init__(self, root, difficulty):
         self.root = root
-        self.root.title("Bird Sort IDS Solution")
+        self.root.title("Bird Sort Greedy Solution")
         center_window(self.root)
 
         self.difficulty = difficulty
@@ -34,7 +34,7 @@ class BirdSortIDS:
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
 
-        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Nodes Generated = 0", font=("Arial", 12))
+        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Queue Size = 0", font=("Arial", 12))
         self.stats_label.pack(pady=5)
 
         self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))
@@ -46,80 +46,61 @@ class BirdSortIDS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
-    def dls(self, state, depth, max_depth, moves, visited, total_nodes_generated):
-        """Depth-limited search helper function"""
-        if depth > max_depth:
-            return None
-
-        state_tuple = tuple(tuple(branch) for branch in state)
-        if state_tuple in visited:
-            return None
-
-        visited.add(state_tuple)
-
-        total_nodes_generated[0] += 1 
-
-        if self.is_solved(state):
-            return moves
-
-        if depth == max_depth:
-            return None
-
-        for new_state, move in self.get_possible_moves(state):
-            new_state_tuple = tuple(tuple(branch) for branch in new_state)
-            if new_state_tuple not in visited:
-                result = self.dls(new_state, depth + 1, max_depth, moves + [move], visited, total_nodes_generated)
-                if result is not None:
-                    return result
-
-        return None
-
     def solve(self):
-        print("Starting IDS...")
-        max_depth = 1
-        max_iterations = 10000
-        iterations = 0
-        total_nodes_generated = [0]
+        print("Starting Greedy search...")
         start_time = time.perf_counter()
+        state = copy.deepcopy(self.branches)
+        moves = []
+        iterations = 0
+        max_iterations = 100000
 
-        while iterations < max_iterations:
-            print(f"Trying depth limit: {max_depth}")
-            visited = set()
-            result = self.dls(copy.deepcopy(self.branches), 0, max_depth, [], visited, total_nodes_generated)
-            
-            if result is not None:
-                end_time = time.perf_counter()
-                self.elapsed_time = end_time - start_time
-                self.solution = result + [None]  # Append None for final state
-                self.final_state = self.get_final_state(result)
-                self.states_explored = iterations
-                self.depth_limit = max_depth
-                self.nodes_generated = total_nodes_generated[0]  # Store final nodes generated count
-                print(f"Solution found at depth {max_depth}!")
-                self.update_step_counter()
-                self.update_stats_display()
-                return
-            
-            max_depth += 1
+        while not self.is_solved(state) and iterations < max_iterations:
+            possible_moves = self.get_possible_moves(state)
+            if not possible_moves:
+                break
+
+            # Choose the move with the lowest heuristic score
+            move = min(possible_moves, key=lambda x: self.heuristic(x[0]))
+            state, move_coords = move
+            moves.append(move_coords)
             iterations += 1
 
-        self.solution = None
-        print(f"No solution found within {max_iterations} depth iterations.")
+        end_time = time.perf_counter()
+        self.elapsed_time = end_time - start_time
+        self.solution = moves + [None] if self.is_solved(state) else None
+        self.final_state = copy.deepcopy(state) if self.is_solved(state) else None
+        self.total_moves = len(moves) if self.is_solved(state) else 0
+        self.states_explored = iterations
+        self.max_queue_size = 0  # Not applicable for Greedy
 
-    def get_final_state(self, moves):
-        """Reconstruct final state from moves"""
-        state = copy.deepcopy(self.branches)
-        for src_idx, dst_idx in moves:
-            bird_to_move = state[src_idx][-1]
-            move_group = 1
-            while move_group < len(state[src_idx]) and state[src_idx][-move_group - 1] == bird_to_move:
-                move_group += 1
+        if self.is_solved(state):
+            print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
+        else:
+            print(f"No solution found after {iterations} iterations.")
 
-            birds_moving = state[src_idx][-move_group:]
-            state[src_idx] = state[src_idx][:-move_group]
-            state[dst_idx].extend(birds_moving)
-            state = self.eliminate_complete_branches(state)
-        return state
+        self.update_step_counter()
+        self.update_stats_display()
+
+    def heuristic(self, state):
+        """Heuristic function to evaluate the state"""
+        score = 0
+        for branch in state:
+            if not branch:
+                continue
+
+            colors = set(branch)
+            if len(colors) > 1:
+                score += len(colors) * 2  # Penalty for mixed colors
+
+            if len(colors) == 1:
+                score -= (len(branch) / 4) * 3  # Reward for nearly complete branches
+
+            for color in colors:
+                color_count = branch.count(color)
+                if color_count < 4:
+                    score += (4 - color_count)  # Penalty for scattered birds
+
+        return score
 
     def is_solved(self, state):
         """Modified to consider empty branches as solved"""
@@ -136,65 +117,59 @@ class BirdSortIDS:
             if not self.is_branch_complete(branch):
                 new_state.append(branch)
             else:
-                new_state.append([])  # Replace complete branch with empty branch
+                new_state.append([])
         return new_state
-    
+
     def get_possible_moves(self, state):
         moves = []
-        state = [list(branch) for branch in state]  # Convert to mutable lists
-        
-        # First eliminate any complete branches
+        state = [list(branch) for branch in state]
         state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
-                continue  # Skip empty branches
+                continue
 
             bird_to_move = src[-1]
             move_group = 1
             while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
-                move_group += 1  # Count consecutive birds of the same color
+                move_group += 1
 
             for j, dst in enumerate(state):
-                if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
+                if i != j and len(dst) + move_group <= 4:
                     if not dst or dst[-1] == bird_to_move:
-                        new_state = copy.deepcopy(state)  # Copy before modifying
-                        birds_moving = new_state[i][-move_group:]  # Take the group
-                        new_state[i] = new_state[i][:-move_group]  # Remove from source
-                        new_state[j].extend(birds_moving)  # Add to destination
-                        
-                        # Check if the move created a complete branch
+                        new_state = copy.deepcopy(state)
+                        birds_moving = new_state[i][-move_group:]
+                        new_state[i] = new_state[i][:-move_group]
+                        new_state[j].extend(birds_moving)
                         new_state = self.eliminate_complete_branches(new_state)
                         moves.append((new_state, (i, j)))
 
         return moves
-    
+
     def draw_state(self, state):
         self.game.canvas.delete("all")
         self.game.draw_background()
 
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
-            
-            # Choose the correct branch image based on position
-            if x < 300:  # Left side
+
+            if x < 300:
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else:
                 branch_img = self.game.branch_img_tk
 
-            # Draw the branch
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
-                if x < 300:  # Left branches grow left-to-right
-                    bird_x_offset = 5 + i * 50
-                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
-                else:  # Right branches grow right-to-left
-                    bird_x_offset = 170 - i * 50
+                if x < 300:
+                    bird_x_offset = 10 + i * 35
+                    bird_image = self.game.bird_images[bird + "_flipped"]
+                else:
+                    bird_x_offset = 140 - i * 35
                     bird_image = self.game.bird_images[bird]
 
-                self.game.canvas.create_image(x + bird_x_offset, y - 60, anchor=tk.NW, image=bird_image)
-    
+                self.game.canvas.create_image(x + bird_x_offset, y - 35, anchor=tk.NW, image=bird_image)
+
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
@@ -206,8 +181,7 @@ class BirdSortIDS:
             self.rebuild_state(self.current_step)
 
     def rebuild_state(self, step):
-        if step == len(self.solution):  
-            # If at the final step, just display the solved state
+        if step == len(self.solution):
             self.draw_state(self.final_state)
         else:
             current_state = copy.deepcopy(self.branches)
@@ -223,13 +197,12 @@ class BirdSortIDS:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                
                 current_state = self.eliminate_complete_branches(current_state)
 
             self.draw_state(current_state)
 
         self.update_step_counter()
-        self.update_game_info()
+        self.update_stats_display()
 
     def update_step_counter(self):
         if self.solution:
@@ -251,19 +224,18 @@ class BirdSortIDS:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+                current_state = self.eliminate_complete_branches(current_state)
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
-            f"Time: {self.elapsed_time:.3f}s, "
-            f"Empty Branches: {empty_branches}, "
-            f"Depth Limit: {self.depth_limit}, "
-            f"Nodes Generated: {self.nodes_generated}"
+            f"Empty Branches = {empty_branches}, "
+            f"States Explored = {self.states_explored}, "
+            f"Max Queue Size = {self.max_queue_size}"
         )
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+        num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
-        info_text = f"Algorithm: IDS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: Greedy, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)

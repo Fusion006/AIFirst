@@ -123,7 +123,6 @@ class BirdSortAStar:
         self.solution = None
         print(f"No solution found after {iterations} iterations.")
 
-    # ... Rest of the methods are the same as in BFS/DFS ...
     def is_solved(self, state):
         """Modified to consider empty branches as solved"""
         return all(len(branch) == 0 for branch in state)
