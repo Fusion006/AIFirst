@@ -77,9 +77,9 @@ class AiSubmenu:
             BirdSortAStar(game_root, difficulty)
         elif algorithm == "IDS":
             BirdSortIDS(game_root, difficulty)
-        elif algorithm == "GREEDY SEARCH":
+        elif algorithm == "Greedy":
             BirdSortGreedy(game_root, difficulty)
-        elif algorithm == "MONTE CARLO TREE SEARCH":
+        elif algorithm == "Monte Carlo":
             BirdSortMonteCarlo(game_root, difficulty)
         else:
             messagebox.showinfo("AI Mode", f"Selected AI: {algorithm}")
