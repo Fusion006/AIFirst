@@ -30,8 +30,8 @@ class BirdSortGame:
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
         # Load branch images 
-        self.branch_img = Image.open("images/branch.png").resize((200, 30), Image.Resampling.LANCZOS)
-        self.highlighted_branch_img = Image.open("images/branch_highlighted.png").resize((200, 30), Image.Resampling.LANCZOS)
+        self.branch_img = Image.open("images/branch.png").resize((250, 30), Image.Resampling.LANCZOS)
+        self.highlighted_branch_img = Image.open("images/branch_highlighted.png").resize((250, 30), Image.Resampling.LANCZOS)
 
         # Flip branch images for left side
         self.branch_img_left = self.branch_img.transpose(Image.FLIP_LEFT_RIGHT)
@@ -45,7 +45,7 @@ class BirdSortGame:
 
         # Load and resize bird images
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png").resize((50, 50), Image.Resampling.LANCZOS)  
+            img = Image.open(f"images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)  
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
         
@@ -84,7 +84,7 @@ class BirdSortGame:
         # Generate positions based on the new number of branches
         def generate_branch_positions():
             screen_height = 750  # Max height
-            branch_spacing = 80  # Space between branches
+            branch_spacing = 100  # Space between branches
             num_per_side = num_branches // 2
             num_left = num_branches // 2
             num_right = num_branches - num_left
@@ -103,7 +103,7 @@ class BirdSortGame:
             y2_positions = [y for y in y2_positions if y + branch_spacing <= screen_height]
 
             left_branches = [(0, y) for y in y1_positions]
-            right_branches = [(400, y) for y in y2_positions]
+            right_branches = [(350, y) for y in y2_positions]
 
             return left_branches + right_branches
 
@@ -154,13 +154,13 @@ class BirdSortGame:
             self.canvas.create_image(branch["x"], branch["y"], anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch["birds"]):
-                bird_x_offset = 10 + i * 35 if branch["x"] < 300 else 140 - i * 35
+                bird_x_offset = 5 + i * 50 if branch["x"] < 300 else 170 - i * 50
                 bird_image = self.bird_images[bird + "_flipped"] if branch["x"] < 300 else self.bird_images[bird]
-                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 35, anchor=tk.NW, image=bird_image)
+                self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 60, anchor=tk.NW, image=bird_image)
 
         if human_game:
-            self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Arial", 16), fill="black")
-            self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Arial", 14), fill="black")
+            self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Times New Roman", 16), fill="black")
+            self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Times New Roman", 14), fill="black")
 
     def draw_background(self):
         self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
@@ -200,7 +200,7 @@ class BirdSortGame:
         #print("Branches:", self.branches)
         for branch in self.branches:
             #print(f"Branch at ({branch['x']}, {branch['y']}) with birds: {branch['birds']}")
-            if branch["x"] < event.x < branch["x"] + 200 and branch["y"] < event.y < branch["y"] + 30:
+            if branch["x"] < event.x < branch["x"] + 350 and branch["y"] < event.y < branch["y"] + 30:
                 if self.selected_branch is None:
                     if branch["birds"]:
                         self.selected_branch = branch
@@ -248,20 +248,6 @@ class BirdSortGame:
     def reset_game(self):
         """Resets the game state and starts a new round with increased difficulty."""
         self.difficulty = get_difficulty()  # Get updated difficulty
-
-        difficulty_settings = {
-            range(1, 5): (4, 6),
-            range(5, 10): (5, 8),
-            range(10, 15): (6, 9),
-            range(15, 20): (7, 10),
-            range(20, 25): (8, 12),
-            range(25, 30): (9, 13),
-        }
-        def get_difficulty_settings(difficulty):
-            for key, value in difficulty_settings.items():
-                if difficulty in key:
-                    return value
-            return (4, 6) 
         
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
@@ -270,7 +256,7 @@ class BirdSortGame:
         # Reload bird images
         self.bird_images.clear()
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png").resize((50, 50), Image.Resampling.LANCZOS)
+            img = Image.open(f"images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))
 
