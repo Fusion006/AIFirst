@@ -12,7 +12,7 @@ class MainMenu:
         # Load background image
         image = Image.open("images/bkg.png")  # Ensure this path is correct
         self.bg_image = ImageTk.PhotoImage(image) # Replace with your image
-        
+
         from difficulty_manager import difficulty_level # type: ignore
         self.difficulty = difficulty_level
         
@@ -22,11 +22,11 @@ class MainMenu:
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
 
         # Create styled buttons
-        self.create_rounded_button(300, 380, "Play (Human)", "#86a340", self.start_game)
-        self.create_rounded_button(300, 480, "Play (AI)", "#5a7547", self.open_ai_submenu)
-        self.create_rounded_button(300, 580, "Quit", "#fbc182", self.root.quit)
+        self.create_button(300, 380, "Play (Human)", "#86a340", self.start_game)
+        self.create_button(300, 480, "Play (AI)", "#5a7547", self.open_ai_submenu)
+        self.create_button(300, 580, "Quit", "#fbc182", self.root.quit)
     
-    def create_rounded_button(self, x, y, text, color, command):
+    def create_button(self, x, y, text, color, command):
         fontezinho = font.Font(family="Trebuchet MS", size=17, weight="bold")
 
         # Create button with no border and ridge relief
