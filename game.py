@@ -1,10 +1,8 @@
 import tkinter as tk
 import random
 from PIL import Image, ImageTk
-from difficulty_manager import increase_difficulty
-from difficulty_manager import reset_difficulty
-from difficulty_manager import get_difficulty
-from difficulty_manager import get_difficulty_settings
+from difficulty_manager import increase_difficulty, reset_difficulty, get_difficulty, get_difficulty_settings
+from hint import get_optimal_move # type: ignore
 
 def center_window(root, width=600, height=800):
     screen_width = root.winfo_screenwidth()
@@ -58,8 +56,26 @@ class BirdSortGame:
         self.draw_game(human_game)
         self.create_back_button()
         
+        if human_game:
+            self.create_hint_button()
+        
         self.root.bind("<Button-1>", self.on_click)
 
+    def create_hint_button(self):
+        """Creates a 'Hint' button in the top-right corner."""
+        self.hint_button = tk.Button(self.root, text="Hint", font=("Arial", 12), command=self.show_hint, bg="lightblue", fg="black")
+        self.hint_button.place(x=400, y=10)  # Position the button in the top-right corner
+
+    def show_hint(self):
+        """Suggests the most optimal move and prints it in the terminal."""
+        branches_state = [branch["birds"] for branch in self.branches]
+        optimal_move = get_optimal_move(branches_state)
+
+        if optimal_move:
+            src_idx, dst_idx = optimal_move
+            print(f"Hint: Move birds from branch {src_idx + 1} to branch {dst_idx + 1}")
+        else:
+            print("No valid moves available.")
     
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
