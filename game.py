@@ -66,16 +66,30 @@ class BirdSortGame:
         self.hint_button = tk.Button(self.root, text="Hint", font=("Arial", 12), command=self.show_hint, bg="lightblue", fg="black")
         self.hint_button.place(x=400, y=10)  # Position the button in the top-right corner
 
+#<<<<<<< Tabnine <<<<<<<
+    def create_hint_button(self):#+
+        """Creates a 'Hint' button in the top-right corner."""#+
+        self.hint_button = tk.Button(self.root, text="Hint", font=("Arial", 12), command=self.show_hint, bg="lightblue", fg="black")#+
+        self.hint_button.place(x=400, y=10)  # Position the button in the top-right corner#+
     def show_hint(self):
-        """Suggests the most optimal move and prints it in the terminal."""
+        """Suggests the most optimal move and prints it in the terminal."""#-
+        """Displays the hint in a text box on the screen for 4 seconds."""#+
         branches_state = [branch["birds"] for branch in self.branches]
         optimal_move = get_optimal_move(branches_state)
 
         if optimal_move:
             src_idx, dst_idx = optimal_move
-            print(f"Hint: Move birds from branch {src_idx + 1} to branch {dst_idx + 1}")
+            print(f"Hint: Move birds from branch {src_idx + 1} to branch {dst_idx + 1}")#-
+            hint_text = f"Move birds from branch {src_idx + 1} to branch {dst_idx + 1}"#+
         else:
-            print("No valid moves available.")
+            print("No valid moves available.")#-
+            hint_text = "No valid moves available."#+
+#+
+        hint_box = self.canvas.create_rectangle(125, 700, 475, 750, fill="white", outline="black")#+
+        hint_text_item = self.canvas.create_text(300, 725, text=hint_text, font=("Arial", 12), fill="black")#+
+#+
+        self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))#+
+#>>>>>>> Tabnine >>>>>>># {"conversationId":"ee3b9284-9a49-44d3-a6be-67e01ef4f8af","source":"instruct"}
     
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
