@@ -6,7 +6,7 @@ from bfs import BirdSortBFS
 from dfs import BirdSortDFS
 from a_star import BirdSortAStar 
 from ids import BirdSortIDS 
-from monte_carlo import BirdSortMonteCarlo #type:ignore
+from weight_a_star import BirdSortWeightedAStar #type:ignore
 from greedy import BirdSortGreedy #type:ignore
 from PIL import Image, ImageTk
 
@@ -26,7 +26,7 @@ class AiSubmenu:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
         
-        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Monte Carlo"]
+        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Weighted A*", "Back to Menu"]
         self.buttons = []
         
         
@@ -91,10 +91,10 @@ class AiSubmenu:
             BirdSortAStar(game_root, difficulty)
         elif algorithm == "IDS":
             BirdSortIDS(game_root, difficulty)
-        elif algorithm == "GREEDY SEARCH":
+        elif algorithm == "Greedy":
             BirdSortGreedy(game_root, difficulty)
-        elif algorithm == "MONTE CARLO TREE SEARCH":
-            BirdSortMonteCarlo(game_root, difficulty)
+        elif algorithm == "Weighted A*":
+            BirdSortWeightedAStar(game_root, difficulty)
         else:
             messagebox.showinfo("AI Mode", f"Selected AI: {algorithm}")
         
