@@ -24,7 +24,7 @@ class BirdSortGame:
     
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
-        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink"], num_colors)
+        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cian", "brown"], num_colors)
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
         # Load branch images 
