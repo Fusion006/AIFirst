@@ -244,7 +244,10 @@ class BirdSortGame:
                                 
                                 for _ in range(len(moving_birds)):
                                     branch["birds"].append(self.selected_branch["birds"].pop())  # Ensure order is preserved
-                                self.score -= 5
+                                if (self.score - 5) > 0:
+                                    self.score -= 5
+                                else:
+                                    self.score = 0
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
                 break
