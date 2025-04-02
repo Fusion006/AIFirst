@@ -24,7 +24,7 @@ class BirdSortGame:
     
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
-        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cian", "brown"], num_colors)
+        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cyan", "brown"], num_colors)
         self.bird_images = {}  # Store images to prevent garbage collection issues
 
         # Load branch images 
@@ -79,8 +79,11 @@ class BirdSortGame:
 
         if optimal_move:
             src_idx, dst_idx = optimal_move
-            print(f"Hint: Move birds from branch {src_idx + 1} to branch {dst_idx + 1}")#-
-            hint_text = f"Move birds from branch {src_idx + 1} to branch {dst_idx + 1}"#+
+            branch_labels = {1: "L1", 2: "L2", 3: "L3", 4: "R1", 5: "R2", 6: "R3"}
+            src_label = branch_labels[src_idx+1]
+            dst_label = branch_labels[dst_idx+1]
+            print(f"Hint: Move birds from branch {src_label} to branch {dst_label}")#-
+            hint_text = f"Move birds from branch {src_label} to branch {dst_label}"#+
         else:
             print("No valid moves available.")#-
             hint_text = "No valid moves available."#+
