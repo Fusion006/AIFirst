@@ -72,7 +72,7 @@ class BirdSortGame:
 
 
     def create_back_button(self):
-        self.back_button = tk.Button(self.root, text="← Go Back", font=("Arial", 12), command=self.go_back_to_menu, bg="lightgray", fg="black")
+        self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
         self.back_button.place(x=10, y=10) 
 
 
@@ -159,8 +159,8 @@ class BirdSortGame:
                 self.canvas.create_image(branch["x"] + bird_x_offset, branch["y"] - 60, anchor=tk.NW, image=bird_image)
 
         if human_game:
-            self.canvas.create_text(530, 28, text=f"Score: {self.score}", font=("Times New Roman", 16), fill="black")
-            self.canvas.create_text(530, 50, text=f"Difficulty: {get_difficulty()}", font=("Times New Roman", 14), fill="black")
+            self.canvas.create_text(300, 28, text=f"Score: {self.score}", font=("Fixedsys", 16, "bold"), fill="black")
+            self.canvas.create_text(300, 50, text=f"Difficulty: {get_difficulty()}", font=("Fixedsys", 14, "bold"), fill="black")
 
     def draw_background(self):
         self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
@@ -286,8 +286,8 @@ class BirdSortGame:
             MainMenu(new_root)
             new_root.mainloop()
 
-        tk.Button(popup, text="Go to Next Level", font=("Arial", 14), command=next_level).pack(pady=10)
-        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), command=return_to_menu).pack(pady=10)
+        tk.Button(popup, text="Go to Next Level", font=("Comic Sans MS", 14), command=next_level).pack(pady=10)
+        tk.Button(popup, text="Return to Main Menu", font=("Comic Sans MS", 14), command=return_to_menu).pack(pady=10)
 
         popup.transient(self.root)
         popup.after(10, lambda: popup.grab_set())

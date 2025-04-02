@@ -1,5 +1,6 @@
 from tkinter import Tk, Button, messagebox, simpledialog, Canvas, font
 from game import center_window
+import tkinter
 from game import BirdSortGame
 from bfs import BirdSortBFS 
 from dfs import BirdSortDFS
@@ -25,12 +26,25 @@ class AiSubmenu:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
         
-        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Monte Carlo", "Back to Menu"]
+        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Monte Carlo"]
         self.buttons = []
         
         
         for i, option in enumerate(options):
             self.create_button(300, 200 + i * 80, option, "#86a340", self.select_option)
+        self.create_back_button()
+
+    def go_back_to_menu(self):
+        """Returns to the main menu and closes the current game window."""
+        self.root.destroy()  
+        from main_menu import MainMenu  
+        new_root = tkinter.Tk()  
+        MainMenu(new_root) 
+        new_root.mainloop()  
+
+    def create_back_button(self):
+        self.back_button = tkinter.Button(self.root, text="←", font=("Fixedsys", 17, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#fbc182", fg="black")
+        self.back_button.place(x=10, y=10) 
 
     def create_button(self, x, y, text, color, command):
         """Creates a styled button inside the Canvas."""
