@@ -26,13 +26,13 @@ class AiSubmenu:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
         
-        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Weighted A*", "Go Back", "Info"]
+        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Weighted A*", "Go Back", "AI Info"]
         self.buttons = []
         
         
         for i, option in enumerate(options):
-            if option == "Info":
-                self.create_button(575, 675, option, "#6a3a03", self.select_option)
+            if option == "AI Info":
+                self.create_button(560, 675, option, "#6a3a03", self.select_option)
             else:
                 self.create_button(300, 210 + i * 80, option, "#86a340", self.select_option)
         
@@ -48,14 +48,14 @@ class AiSubmenu:
         """Creates a styled button inside the Canvas."""
         btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
 
-        if text == "Info":
+        if text == "AI Info":
             btn = Button(self.root, text=text, font=btn_font,
                         bg=color, fg="white",
                         activebackground=self.lighten_color(color),  # Prevents gray hover effect
                         activeforeground="white",  # Keeps text white when hovered
                         borderwidth=0, relief="raised",  # Ridge effect
-                        highlightthickness=0, command=command)
-            btn.place(x=x - 100, y=y - 25, width=75, height=50)
+                        highlightthickness=0, command=lambda: command(text))
+            btn.place(x=x - 100, y=y - 25, width=100, height=50)
         else: 
             btn = Button(self.root, text=text, font=btn_font,
                         bg=color, fg="white",
@@ -114,6 +114,12 @@ class AiSubmenu:
             from main_menu import MainMenu
             root = Tk()
             MainMenu(root)
+            root.mainloop()
+        if option == "AI Info":
+            self.root.destroy()
+            from info_page_ai import InfoPage_AI
+            root = Tk()
+            InfoPage_AI(root)
             root.mainloop()
         else:
             def start_with_difficulty(difficulty):

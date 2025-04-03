@@ -197,7 +197,7 @@ class BirdSortAStar:
             self.rebuild_state(self.current_step)
 
     def next_step(self):
-        if self.solution and self.current_step < len(self.solution):
+        if self.solution and self.current_step < (len(self.solution)-1):
             self.current_step += 1
             self.rebuild_state(self.current_step)
 
@@ -227,7 +227,7 @@ class BirdSortAStar:
 
     def update_step_counter(self):
         if self.solution:
-            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)}")
+            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
     
     def update_stats_display(self):

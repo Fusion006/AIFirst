@@ -25,7 +25,7 @@ class MainMenu:
         self.create_button(300, 350, "Play", "#86a340", self.start_game)
         self.create_button(300, 450, "AI", "#5a7547", self.open_ai_submenu)
         self.create_button(300, 550, "Quit", "#fbc182", self.root.quit)
-        self.create_button(575, 675, "Info", "#6a3a03", self.open_instructions)
+        self.create_button(575, 675, "Info", "#6a3a03", self.open_info_page)
     
     def create_button(self, x, y, text, color, command):
         btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
@@ -66,11 +66,11 @@ class MainMenu:
         AiSubmenu(root)
         root.mainloop()
 
-    def open_instructions(self):
-        from instructions_menu import InstructionsPage
+    def open_info_page(self):
+        from info_page import InfoPage
         self.root.destroy()
         root = Tk()
-        InstructionsPage(root)
+        InfoPage(root)
         root.mainloop()
 
 if __name__ == "__main__":
