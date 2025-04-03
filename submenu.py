@@ -26,14 +26,16 @@ class AiSubmenu:
         self.canvas.pack(fill="both", expand=True)
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
         
-        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Weighted A*", "Back to Menu"]
+        options = ["DFS", "BFS", "IDS", "Greedy", "A*", "Weighted A*", "Go Back", "Info"]
         self.buttons = []
         
         
         for i, option in enumerate(options):
-            self.create_button(300, 200 + i * 80, option, "#86a340", self.select_option)
-        self.create_back_button()
-
+            if option == "Info":
+                self.create_button(575, 675, option, "#6a3a03", self.select_option)
+            else:
+                self.create_button(300, 210 + i * 80, option, "#86a340", self.select_option)
+        
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
         self.root.destroy()  
@@ -42,24 +44,29 @@ class AiSubmenu:
         MainMenu(new_root) 
         new_root.mainloop()  
 
-    def create_back_button(self):
-        self.back_button = tkinter.Button(self.root, text="←", font=("Fixedsys", 17, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#fbc182", fg="black")
-        self.back_button.place(x=10, y=10) 
-
     def create_button(self, x, y, text, color, command):
         """Creates a styled button inside the Canvas."""
         btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
 
-        btn = Button(self.root, text=text, font=btn_font,
-                     bg=color, fg="white",
-                     activebackground=self.lighten_color(color), 
-                     activeforeground="white",
-                     borderwidth=3, relief="raised",
-                     command=lambda: command(text))  # Pass button text as argument
-        
-        # Add button to canvas
-        btn_window = self.canvas.create_window(x, y, window=btn, width=250, height=50)
-        self.buttons.append(btn_window)
+        if text == "Info":
+            btn = Button(self.root, text=text, font=btn_font,
+                        bg=color, fg="white",
+                        activebackground=self.lighten_color(color),  # Prevents gray hover effect
+                        activeforeground="white",  # Keeps text white when hovered
+                        borderwidth=0, relief="raised",  # Ridge effect
+                        highlightthickness=0, command=command)
+            btn.place(x=x - 100, y=y - 25, width=75, height=50)
+        else: 
+            btn = Button(self.root, text=text, font=btn_font,
+                        bg=color, fg="white",
+                        activebackground=self.lighten_color(color), 
+                        activeforeground="white",
+                        borderwidth=3, relief="raised",
+                        command=lambda: command(text))  # Pass button text as argument
+            
+            # Add button to canvas
+            btn_window = self.canvas.create_window(x, y, window=btn, width=200, height=50)
+            self.buttons.append(btn_window)
 
     def lighten_color(self, color, factor=30):
         """Lightens the given color slightly for hover effect."""
@@ -68,7 +75,7 @@ class AiSubmenu:
 
 
     def select_option(self, option):
-        if option == "Back to Menu":
+        if option == "Go Back":
             self.root.destroy()
             from main_menu import MainMenu
             root = Tk()

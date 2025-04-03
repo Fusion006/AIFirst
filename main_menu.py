@@ -22,31 +22,41 @@ class MainMenu:
         self.canvas.create_image(0, 0, anchor="nw", image=self.bg_image)
 
         # Create styled buttons
-        self.create_button(300, 380, "Play (Human)", "#86a340", self.start_game)
-        self.create_button(300, 480, "Play (AI)", "#5a7547", self.open_ai_submenu)
-        self.create_button(300, 580, "Quit", "#fbc182", self.root.quit)
+        self.create_button(300, 350, "Play", "#86a340", self.start_game)
+        self.create_button(300, 450, "AI", "#5a7547", self.open_ai_submenu)
+        self.create_button(300, 550, "Quit", "#fbc182", self.root.quit)
+        self.create_button(575, 675, "Info", "#6a3a03", self.open_instructions)
     
     def create_button(self, x, y, text, color, command):
-        fontezinho = font.Font(family="Trebuchet MS", size=17, weight="bold")
-
-        # Create button with no border and ridge relief
-        btn = tk.Button(self.root, text=text, font=fontezinho,
+        btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
+    
+        # Place button properly in the window~
+        if text == "Info":
+            btn = tk.Button(self.root, text=text, font=btn_font,
+                        bg=color, fg="white",
+                        activebackground=self.lighten_color(color),  # Prevents gray hover effect
+                        activeforeground="white",  # Keeps text white when hovered
+                        borderwidth=0, relief="raised",  # Ridge effect
+                        highlightthickness=0, command=command)
+            btn.place(x=x - 100, y=y - 25, width=75, height=50)
+        else:
+            btn = tk.Button(self.root, text=text, font=btn_font,
                         bg=color, fg="white",
                         activebackground=self.lighten_color(color),  # Prevents gray hover effect
                         activeforeground="white",  # Keeps text white when hovered
                         borderwidth=3, relief="raised",  # Ridge effect
                         command=command)
-        
-        # Place button properly in the window
-        btn.place(x=x - 100, y=y - 25, width=200, height=50)
+            btn.place(x=x - 100, y=y - 25, width=200, height=50)
 
+    """
     def create_instructions_button(self):
-        """Creates the 'Instructions' button in the bottom-right corner."""
-        btn = tk.Button(self.root, text="Instructions", font=("Arial", 12),
+        Creates the 'Instructions' button in the bottom-right corner.
+        btn = tk.Button(self.root, text="Instructions", font=("Fixedsys", 12),
                         bg="#5a7547", fg="white",
                         activebackground="#86a340", activeforeground="white",
                         command=self.open_instructions)
-        btn.place(x=450, y=750, width=120, height=40) 
+        btn.place(x=450, y=450, width=120, height=40) 
+    """
 
     def lighten_color(self, color, factor=30):
         """Lightens the given color slightly."""
@@ -64,6 +74,13 @@ class MainMenu:
         self.root.destroy()
         root = Tk()
         AiSubmenu(root)
+        root.mainloop()
+
+    def open_instructions(self):
+        from instructions_menu import InstructionsPage
+        self.root.destroy()
+        root = Tk()
+        InstructionsPage(root)
         root.mainloop()
 
 if __name__ == "__main__":
