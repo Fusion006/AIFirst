@@ -54,7 +54,7 @@ class BirdSortGame:
         self.score = 100
         self.init_branches(num_branches)
         self.draw_game(human_game)
-        self.create_back_button()
+        self.create_back_button(difficulty)
         
         if human_game:
             self.create_hint_button()
@@ -63,17 +63,12 @@ class BirdSortGame:
 
     def create_hint_button(self):
         """Creates a 'Hint' button in the top-right corner."""
-        self.hint_button = tk.Button(self.root, text="Hint", font=("Arial", 12), command=self.show_hint, bg="lightblue", fg="black")
-        self.hint_button.place(x=400, y=10)  # Position the button in the top-right corner
+        self.hint_button = tk.Button(self.root, text="Hint", font=("Fixedsys", 12), command=self.show_hint, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
+        self.hint_button.place(x=530, y=15)  # Position the button in the top-right corner
 
-#<<<<<<< Tabnine <<<<<<<
-    def create_hint_button(self):#+
-        """Creates a 'Hint' button in the top-right corner."""#+
-        self.hint_button = tk.Button(self.root, text="Hint", font=("Arial", 12), command=self.show_hint, bg="lightblue", fg="black")#+
-        self.hint_button.place(x=400, y=10)  # Position the button in the top-right corner#+
     def show_hint(self):
-        """Suggests the most optimal move and prints it in the terminal."""#-
-        """Displays the hint in a text box on the screen for 4 seconds."""#+
+        """Suggests the most optimal move and prints it in the terminal."""
+        """Displays the hint in a text box on the screen for 4 seconds."""
         branches_state = [branch["birds"] for branch in self.branches]
         optimal_move = get_optimal_move(branches_state)
 
@@ -82,18 +77,17 @@ class BirdSortGame:
             branch_labels = {1: "L1", 2: "L2", 3: "L3", 4: "R1", 5: "R2", 6: "R3"}
             src_label = branch_labels[src_idx+1]
             dst_label = branch_labels[dst_idx+1]
-            print(f"Hint: Move birds from branch {src_label} to branch {dst_label}")#-
-            hint_text = f"Move birds from branch {src_label} to branch {dst_label}"#+
+            print(f"Hint: Move birds from branch {src_label} to branch {dst_label}")
+            hint_text = f"Move birds from branch {src_label} to branch {dst_label}"
         else:
-            print("No valid moves available.")#-
-            hint_text = "No valid moves available."#+
-#+
-        hint_box = self.canvas.create_rectangle(125, 700, 475, 750, fill="white", outline="black")#+
-        hint_text_item = self.canvas.create_text(300, 725, text=hint_text, font=("Arial", 12), fill="black")#+
-#+
-        self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))#+
-#>>>>>>> Tabnine >>>>>>># {"conversationId":"ee3b9284-9a49-44d3-a6be-67e01ef4f8af","source":"instruct"}
-    
+            print("No valid moves available.")
+            hint_text = "No valid moves available."
+
+        hint_box = self.canvas.create_rectangle(125, 700, 475, 750, fill="#7cbd76", outline="black")
+        hint_text_item = self.canvas.create_text(300, 725, text=hint_text, font=("Arial", 12, "bold"), fill="black")
+
+        self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))
+
     def go_back_to_menu(self):
         """Returns to the main menu and closes the current game window."""
         reset_difficulty() 
@@ -104,8 +98,11 @@ class BirdSortGame:
         new_root.mainloop()  
 
 
-    def create_back_button(self):
-        self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
+    def create_back_button(self, difficulty=None):
+        if difficulty:
+            self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, fg="black")
+        else:
+            self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
         self.back_button.place(x=10, y=10) 
 
 
@@ -233,7 +230,7 @@ class BirdSortGame:
         #print("Branches:", self.branches)
         for branch in self.branches:
             #print(f"Branch at ({branch['x']}, {branch['y']}) with birds: {branch['birds']}")
-            if branch["x"] < event.x < branch["x"] + 350 and branch["y"] < event.y < branch["y"] + 30:
+            if branch["x"] < event.x < branch["x"] + 350 and branch["y"]-50 < event.y < branch["y"] + 30:
                 if self.selected_branch is None:
                     if branch["birds"]:
                         self.selected_branch = branch
@@ -301,12 +298,12 @@ class BirdSortGame:
 
 
     def show_win_popup(self):
-        popup = tk.Toplevel(self.root)
-        popup.title("Game Over")
+        popup = tk.Toplevel(self.root, background="#48b9d7")
+        popup.title(" ")
         center_window(popup, 400, 200)
 
-        tk.Label(popup, text="🎉 Congratulations! 🎉", font=("Arial", 20)).pack(pady=10)
-        tk.Label(popup, text=f"Final Score: {self.score}", font=("Arial", 16)).pack(pady=5)
+        tk.Label(popup, text="🎉 Congratulations! 🎉", fg="white", font=("Arial", 20, "bold"), background="#48b9d7").pack(pady=10)
+        tk.Label(popup, text=f"Final Score: {self.score}", fg="white", font=("Arial", 16, "bold"), background="#48b9d7").pack(pady=5)
 
         def next_level():
             increase_difficulty()  # Increase difficulty before restarting
@@ -322,8 +319,8 @@ class BirdSortGame:
             MainMenu(new_root)
             new_root.mainloop()
 
-        tk.Button(popup, text="Go to Next Level", font=("Comic Sans MS", 14), command=next_level).pack(pady=10)
-        tk.Button(popup, text="Return to Main Menu", font=("Comic Sans MS", 14), command=return_to_menu).pack(pady=10)
+        tk.Button(popup, text="Go to Next Level", font=("Arial", 14), background="white", borderwidth=0, highlightthickness=0, command=next_level).pack(pady=10)
+        tk.Button(popup, text="Return to Main Menu", font=("Arial", 14), background="white", borderwidth=0, highlightthickness=0, command=return_to_menu).pack(pady=10)
 
         popup.transient(self.root)
         popup.after(10, lambda: popup.grab_set())
