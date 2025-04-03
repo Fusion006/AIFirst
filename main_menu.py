@@ -48,16 +48,6 @@ class MainMenu:
                         command=command)
             btn.place(x=x - 100, y=y - 25, width=200, height=50)
 
-    """
-    def create_instructions_button(self):
-        Creates the 'Instructions' button in the bottom-right corner.
-        btn = tk.Button(self.root, text="Instructions", font=("Fixedsys", 12),
-                        bg="#5a7547", fg="white",
-                        activebackground="#86a340", activeforeground="white",
-                        command=self.open_instructions)
-        btn.place(x=450, y=450, width=120, height=40) 
-    """
-
     def lighten_color(self, color, factor=30):
         """Lightens the given color slightly."""
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)

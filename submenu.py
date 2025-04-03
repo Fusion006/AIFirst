@@ -73,7 +73,41 @@ class AiSubmenu:
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
         return f'#{min(r+factor, 255):02x}{min(g+factor, 255):02x}{min(b+factor, 255):02x}'
 
+    def custom_difficulty_popup(self, callback):
+        popup = tkinter.Toplevel(self.root, background="#48b9d7")
+        popup.title(" ")
+        popup.geometry("400x200")
 
+        tkinter.Label(popup, text="🛠 Select Difficulty 🛠", fg="white", font=("Arial", 20, "bold"), background="#48b9d7").pack(pady=10)
+        tkinter.Label(popup, text="Enter difficulty level (1-35):", fg="white", font=("Arial", 14), background="#48b9d7").pack(pady=5)
+
+        entry = tkinter.Entry(popup, font=("Arial", 14))
+        entry.pack(pady=10)
+
+        error_label = tkinter.Label(popup, text="", fg="red", font=("Arial", 12, "bold"), background="#48b9d7")
+        error_label.pack(pady=1)
+        
+        def submit():
+            try:
+                difficulty = int(entry.get())
+                if 1 <= difficulty <= 35:
+                    popup.destroy()
+                    callback(difficulty)
+                else:
+                    #entry.delete(0, tkinter.END)
+                    #entry.insert(0, "Invalid (1-35)")
+                    error_label.config(text="⚠️ Enter a number between 1 and 35!")
+            except ValueError:
+                #entry.delete(0, tkinter.END)
+                #entry.insert(0, "Invalid Input")
+                error_label.config(text="⚠️ Invalid input! Please enter a number.")
+
+        tkinter.Button(popup, text="Confirm", font=("Arial", 14), background="white", borderwidth=0, highlightthickness=0, command=submit).pack(pady=5)
+
+        popup.transient(self.root)
+        popup.after(10, lambda: popup.grab_set())
+        self.root.wait_window(popup)
+        
     def select_option(self, option):
         if option == "Go Back":
             self.root.destroy()
@@ -82,9 +116,9 @@ class AiSubmenu:
             MainMenu(root)
             root.mainloop()
         else:
-            difficulty = simpledialog.askinteger("Select Difficulty", "Enter difficulty level (1-35):", minvalue=1, maxvalue=35)
-            if difficulty:
+            def start_with_difficulty(difficulty):
                 self.start_ai(option, difficulty)
+            self.custom_difficulty_popup(start_with_difficulty)
 
     def start_ai(self, algorithm, difficulty):
         self.root.destroy()

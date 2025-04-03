@@ -89,7 +89,6 @@ class BirdSortGame:
         self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))
 
     def go_back_to_menu(self):
-        """Returns to the main menu and closes the current game window."""
         reset_difficulty() 
         self.root.destroy()  
         from main_menu import MainMenu  
@@ -97,10 +96,17 @@ class BirdSortGame:
         MainMenu(new_root) 
         new_root.mainloop()  
 
+    def go_back_to_ai_menu(self):
+        reset_difficulty() 
+        self.root.destroy()  
+        from submenu import AiSubmenu 
+        new_root = tk.Tk()  
+        AiSubmenu(new_root)
+        new_root.mainloop() 
 
     def create_back_button(self, difficulty=None):
         if difficulty:
-            self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, fg="black")
+            self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_ai_menu, borderwidth=0, highlightthickness=0, fg="black")
         else:
             self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
         self.back_button.place(x=10, y=10) 
