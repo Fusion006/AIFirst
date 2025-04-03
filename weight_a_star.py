@@ -4,6 +4,7 @@ import time
 import heapq
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
+from tkinter import messagebox
 
 class BirdSortWeightedAStar:
     def __init__(self, root, difficulty, weight=2.0):
@@ -70,6 +71,32 @@ class BirdSortWeightedAStar:
 
         self.solution = None
         print(f"No solution found after {iterations} iterations.")
+        self.show_no_solution_popup(iterations)
+
+    def show_no_solution_popup(self, iterations):
+        popup = tk.Toplevel(self.root)
+        popup.title("No Solution Found")
+        popup.configure(bg="red")
+        popup.geometry("280x100")
+        popup.transient(self.root)  # Make popup modal
+        popup.grab_set()  # Ensure popup is focused
+        
+        # Center the popup relative to the main window
+        self.root.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (280 // 2)
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
+        popup.geometry(f"280x100+{x}+{y}")
+        
+        label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
+                         font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
+        label.pack(pady=10, padx=10)
+
+        close_button = tk.Button(popup, text="OK", font=("Arial", 10), command=popup.destroy, 
+                                 bg="white", fg="black")
+        close_button.pack(pady=5)
+        
+        popup.lift()  # Raise popup above other windows
+        popup.attributes('-topmost', True)  # Force popup to stay on top
 
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
@@ -195,7 +222,7 @@ class BirdSortWeightedAStar:
             self.rebuild_state(self.current_step)
 
     def next_step(self):
-        if self.solution and self.current_step < len(self.solution):
+        if self.solution and self.current_step < (len(self.solution)-1):
             self.current_step += 1
             self.rebuild_state(self.current_step)
 
@@ -225,7 +252,7 @@ class BirdSortWeightedAStar:
 
     def update_step_counter(self):
         if self.solution:
-            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)}")
+            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
     def update_stats_display(self):
         if self.current_step == len(self.solution):

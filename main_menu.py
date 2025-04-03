@@ -25,7 +25,7 @@ class MainMenu:
         self.create_button(300, 350, "Play", "#86a340", self.start_game)
         self.create_button(300, 450, "AI", "#5a7547", self.open_ai_submenu)
         self.create_button(300, 550, "Quit", "#fbc182", self.root.quit)
-        self.create_button(575, 675, "Info", "#6a3a03", self.open_instructions)
+        self.create_button(575, 675, "Info", "#6a3a03", self.open_info_page)
     
     def create_button(self, x, y, text, color, command):
         btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
@@ -48,16 +48,6 @@ class MainMenu:
                         command=command)
             btn.place(x=x - 100, y=y - 25, width=200, height=50)
 
-    """
-    def create_instructions_button(self):
-        Creates the 'Instructions' button in the bottom-right corner.
-        btn = tk.Button(self.root, text="Instructions", font=("Fixedsys", 12),
-                        bg="#5a7547", fg="white",
-                        activebackground="#86a340", activeforeground="white",
-                        command=self.open_instructions)
-        btn.place(x=450, y=450, width=120, height=40) 
-    """
-
     def lighten_color(self, color, factor=30):
         """Lightens the given color slightly."""
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
@@ -76,11 +66,11 @@ class MainMenu:
         AiSubmenu(root)
         root.mainloop()
 
-    def open_instructions(self):
-        from instructions_menu import InstructionsPage
+    def open_info_page(self):
+        from info_page import InfoPage
         self.root.destroy()
         root = Tk()
-        InstructionsPage(root)
+        InfoPage(root)
         root.mainloop()
 
 if __name__ == "__main__":

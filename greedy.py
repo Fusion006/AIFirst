@@ -3,6 +3,7 @@ import copy
 import time
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
+from tkinter import messagebox
 
 class BirdSortGreedy:
     def __init__(self, root, difficulty):
@@ -34,7 +35,7 @@ class BirdSortGreedy:
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
 
-        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Queue Size = 0", font=("Arial", 12))
+        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0", font=("Arial", 11))
         self.stats_label.pack(pady=5)
 
         self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))
@@ -48,16 +49,21 @@ class BirdSortGreedy:
 
     def solve(self):
         print("Starting Greedy search...")
-        start_time = time.perf_counter()
         state = copy.deepcopy(self.branches)
         moves = []
         iterations = 0
+        max_queue_size = 0
+        total_nodes_generated = 0
         max_iterations = 100000
+        start_time = time.perf_counter()
 
         while not self.is_solved(state) and iterations < max_iterations:
             possible_moves = self.get_possible_moves(state)
             if not possible_moves:
                 break
+
+            max_queue_size = max(max_queue_size, len(possible_moves))
+            total_nodes_generated += len(possible_moves)
 
             # Choose the move with the lowest heuristic score
             move = min(possible_moves, key=lambda x: self.heuristic(x[0]))
@@ -65,21 +71,49 @@ class BirdSortGreedy:
             moves.append(move_coords)
             iterations += 1
 
-        end_time = time.perf_counter()
-        self.elapsed_time = end_time - start_time
-        self.solution = moves + [None] if self.is_solved(state) else None
-        self.final_state = copy.deepcopy(state) if self.is_solved(state) else None
-        self.total_moves = len(moves) if self.is_solved(state) else 0
-        self.states_explored = iterations
-        self.max_queue_size = 0  # Not applicable for Greedy
-
         if self.is_solved(state):
+            end_time = time.perf_counter()
+            self.elapsed_time = end_time - start_time
+            self.solution = moves + [None]
+            self.final_state = copy.deepcopy(state)
+            self.total_moves = len(moves)
+            self.states_explored = iterations
+            self.max_queue_size = max_queue_size
+            self.total_nodes_generated = total_nodes_generated
+            self.avg_branching_factor = total_nodes_generated / iterations if iterations > 0 else 0
             print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
-        else:
-            print(f"No solution found after {iterations} iterations.")
+            self.update_step_counter()
+            self.update_stats_display()
+            return
+        
+        self.solution = None
+        print(f"No solution found after {iterations} iterations.")
+        self.show_no_solution_popup(iterations)
 
-        self.update_step_counter()
-        self.update_stats_display()
+    def show_no_solution_popup(self, iterations):
+        popup = tk.Toplevel(self.root)
+        popup.title("No Solution Found")
+        popup.configure(bg="red")
+        popup.geometry("280x100")
+        popup.transient(self.root)  # Make popup modal
+        popup.grab_set()  # Ensure popup is focused
+        
+        # Center the popup relative to the main window
+        self.root.update_idletasks()
+        x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (280 // 2)
+        y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
+        popup.geometry(f"280x100+{x}+{y}")
+        
+        label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
+                         font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
+        label.pack(pady=10, padx=10)
+
+        close_button = tk.Button(popup, text="OK", font=("Arial", 10), command=popup.destroy, 
+                                 bg="white", fg="black")
+        close_button.pack(pady=5)
+        
+        popup.lift()  # Raise popup above other windows
+        popup.attributes('-topmost', True)  # Force popup to stay on top
 
     def heuristic(self, state):
         """Heuristic function to evaluate the state"""
@@ -176,7 +210,7 @@ class BirdSortGreedy:
             self.rebuild_state(self.current_step)
 
     def next_step(self):
-        if self.solution and self.current_step < len(self.solution):
+        if self.solution and self.current_step < (len(self.solution)-1):
             self.current_step += 1
             self.rebuild_state(self.current_step)
 
@@ -206,7 +240,7 @@ class BirdSortGreedy:
 
     def update_step_counter(self):
         if self.solution:
-            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)}")
+            self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
     def update_stats_display(self):
         if self.current_step == len(self.solution):
@@ -228,14 +262,15 @@ class BirdSortGreedy:
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
+            f"Time: {self.elapsed_time:.3f}s, "
             f"Empty Branches = {empty_branches}, "
             f"States Explored = {self.states_explored}, "
-            f"Max Queue Size = {self.max_queue_size}"
+            f"Avg Branching Factor = {self.avg_branching_factor:.2f}"
         )
         self.stats_label.config(text=stats_text)
 
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 
-        info_text = f"Algorithm: Greedy, Time: {self.elapsed_time:.3f}s, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
+        info_text = f"Algorithm: Greedy, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
