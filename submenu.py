@@ -32,7 +32,7 @@ class AiSubmenu:
         
         for i, option in enumerate(options):
             if option == "AI Info":
-                self.create_button(560, 675, option, "#6a3a03", self.select_option)
+                self.create_button(570, 675, option, "#6a3a03", self.select_option)
             else:
                 self.create_button(300, 210 + i * 80, option, "#86a340", self.select_option)
         
@@ -65,7 +65,7 @@ class AiSubmenu:
                         command=lambda: command(text))  # Pass button text as argument
             
             # Add button to canvas
-            btn_window = self.canvas.create_window(x, y, window=btn, width=200, height=50)
+            btn_window = self.canvas.create_window(x, y, window=btn, width=190, height=50)
             self.buttons.append(btn_window)
 
     def lighten_color(self, color, factor=30):
