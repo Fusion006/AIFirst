@@ -1,4 +1,4 @@
-from tkinter import Tk, Label, Button, Canvas, font
+from tkinter import Tk, font
 from game import BirdSortGame
 from game import center_window
 import tkinter as tk

@@ -1,5 +1,4 @@
 import tkinter as tk
-from main_menu import MainMenu  
 from PIL import Image, ImageTk
 
 # This Page only has a "Back" button.

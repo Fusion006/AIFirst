@@ -1,7 +1,6 @@
-from tkinter import Tk, Button, messagebox, simpledialog, Canvas, font
+from tkinter import Tk, Button, messagebox, Canvas, font
 from game import center_window
 import tkinter
-from game import BirdSortGame
 from bfs import BirdSortBFS 
 from dfs import BirdSortDFS
 from a_star import BirdSortAStar 
