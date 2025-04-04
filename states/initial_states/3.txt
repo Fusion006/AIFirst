@@ -1,0 +1,7 @@
+brown red red
+yellow cyan yellow
+red green cyan
+green red brown
+yellow green cyan
+green brown brown
+yellow cyan
