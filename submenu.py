@@ -94,12 +94,8 @@ class AiSubmenu:
                     popup.destroy()
                     callback(difficulty)
                 else:
-                    #entry.delete(0, tkinter.END)
-                    #entry.insert(0, "Invalid (1-35)")
                     error_label.config(text="⚠️ Enter a number between 1 and 35!")
             except ValueError:
-                #entry.delete(0, tkinter.END)
-                #entry.insert(0, "Invalid Input")
                 error_label.config(text="⚠️ Invalid input! Please enter a number.")
 
         tkinter.Button(popup, text="Confirm", font=("Arial", 14), background="white", borderwidth=0, highlightthickness=0, command=submit).pack(pady=5)

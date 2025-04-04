@@ -31,9 +31,11 @@ class BirdSortIDS:
 
         prev_button = tk.Button(control_frame, text="← Previous", font=("Arial", 12), command=self.previous_step)
         next_button = tk.Button(control_frame, text="Next →", font=("Arial", 12), command=self.next_step)
+        save_button = tk.Button(control_frame, text="Save", font=("Arial", 12), command=self.save_result)
 
         prev_button.pack(side=tk.LEFT, padx=5)
         next_button.pack(side=tk.LEFT, padx=5)
+        save_button.pack(side=tk.RIGHT, padx=5)
 
         self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Nodes Generated = 0", font=("Arial", 12))
         self.stats_label.pack(pady=5)
@@ -46,6 +48,27 @@ class BirdSortIDS:
         self.root.bind("<Left>", lambda e: self.previous_step())
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
+
+    def save_result(self):
+        num_colors, num_branches = get_difficulty_settings(self.difficulty) 
+
+        # NAO MEXER NA INDENTAÇÃO DESTA FUNÇÃO POR FAVOR
+
+        result_data = f"""Algorithm: IDS
+Difficulty: {self.difficulty}             
+Colors: {num_colors}
+Branches: {num_branches}
+Time Taken: {self.elapsed_time:.6f}s
+States Explored: {self.states_explored}
+Depth Limit: {self.depth_limit}
+Nodes Generated: {self.nodes_generated}
+Solution Steps:
+""" + "\n".join(f"{i+1}. {step}" for i, step in enumerate(self.solution))
+        
+        filename = f"game_states/results/ids/IDS_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
+        with open(filename, "w") as file:
+            file.write(result_data)
+        messagebox.showinfo("Saved", f"Results saved to {filename}")
 
     def dls(self, state, depth, max_depth, moves, visited, total_nodes_generated):
         """Depth-limited search helper function"""
