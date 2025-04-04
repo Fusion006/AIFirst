@@ -22,6 +22,11 @@ class BirdSortGreedy:
 
         self.solve()
 
+    # CONTROLS:
+    # - Previous -> Go a step back (works by Button or Left Arrow Key)
+    # - Next -> Go a step ahead (works by Button or Right Arrow Key)
+    # - Save -> Save Algorithm Execution to a .txt file (works by Button)
+    # - Dynamically changes game statistics
     def create_controls(self):
         control_frame = tk.Frame(self.root, bg="lightgray")
         control_frame.pack(side=tk.TOP, pady=10)
@@ -49,10 +54,12 @@ class BirdSortGreedy:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    # Saves results to a .txt file
+    # - The result data is specific to the algorithm
     def save_result(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty) 
 
-        # NAO MEXER NA INDENTAÇÃO DESTA FUNÇÃO POR FAVOR
+        # !!! NAO MEXER NA INDENTAÇÃO DESTA FUNÇÃO POR FAVOR
 
         result_data = f"""Algorithm: Greedy
 Difficulty: {self.difficulty}             
@@ -69,6 +76,10 @@ Solution Steps:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")
 
+    # Main Algorithm Function
+    # - Checks for Solution -> Saves collected information in variables
+    # - If no solution was found, a Popup displays a warning message
+    # - If the algorithm doesn't find a solution after a minute, it displays a Popup with a warning
     def solve(self):
         print("Starting Greedy search...")
         state = copy.deepcopy(self.branches)
@@ -78,8 +89,8 @@ Solution Steps:
         total_nodes_generated = 0
         max_iterations = 100000
         start_time = time.perf_counter()
-        timeout_seconds = 60  # Stop after a minute
-        timed_out = False  # Track whether timeout occurred
+        timeout_seconds = 60 # Algorithm stops running if a minute passes
+        timed_out = False
 
         while not self.is_solved(state) and iterations < max_iterations:
 
@@ -123,15 +134,17 @@ Solution Steps:
             print(f"No solution found after {iterations} iterations.")
             self.show_no_solution_popup(iterations, timed_out=False)
 
+    # No Solution Popup (two cases)
+    # 1. Solution doesn't exist with this algorithm
+    # 2. 60 second timeout after no solution was found
     def show_no_solution_popup(self, iterations, timed_out=False):
         popup = tk.Toplevel(self.root)
         popup.title("No Solution Found")
         popup.configure(bg="red")
         popup.geometry("280x100")
-        popup.transient(self.root)  # Make popup modal
-        popup.grab_set()  # Ensure popup is focused
+        popup.transient(self.root)
+        popup.grab_set()  
         
-        # Center the popup relative to the main window
         self.root.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (280 // 2)
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
@@ -173,16 +186,16 @@ Solution Steps:
 
         return score
 
+    # Considers all empty branches as solved
     def is_solved(self, state):
-        """Modified to consider empty branches as solved"""
         return all(len(branch) == 0 for branch in state)
 
+    # Check if a branch has exactly 4 birds of the same color
     def is_branch_complete(self, branch):
-        """Check if a branch has exactly 4 birds of the same color"""
         return len(branch) == 4 and all(bird == branch[0] for bird in branch)
 
+    # Remove complete branches from game state (Note: they remain visible)
     def eliminate_complete_branches(self, state):
-        """Remove complete branches from game state"""
         new_state = []
         for branch in state:
             if not self.is_branch_complete(branch):
@@ -223,34 +236,38 @@ Solution Steps:
 
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
-
-            if x < 300:
+            # Choose the correct branch image based on position
+            if x < 300: # Left side
                 branch_img = self.game.branch_img_left_tk
-            else:
+            else: # Right side
                 branch_img = self.game.branch_img_tk
 
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
-                if x < 300:
+                # Choose the correct branch image based on position
+                if x < 300: # Left branches grow left-to-right
                     bird_x_offset = 5 + i * 50
                     bird_image = self.game.bird_images[bird + "_flipped"]
-                else:
+                else: # Right branches grow right-to-left
                     bird_x_offset = 170 - i * 50
                     bird_image = self.game.bird_images[bird]
 
                 self.game.canvas.create_image(x + bird_x_offset, y - 60, anchor=tk.NW, image=bird_image)
 
+    # INTERFACE CONTROLS - "Go back a step button" is pressed
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
             self.rebuild_state(self.current_step)
 
+    # INTERFACE CONTROLS - "Go step ahead button" is pressed
     def next_step(self):
         if self.solution and self.current_step < (len(self.solution)-1):
             self.current_step += 1
             self.rebuild_state(self.current_step)
 
+    # Dynamically updates labels at the top of the screen and redraws the game to match current state
     def rebuild_state(self, step):
         if step == len(self.solution):
             self.draw_state(self.final_state)
@@ -279,6 +296,7 @@ Solution Steps:
         if self.solution:
             self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
+    # Dynamic Statistics Label 
     def update_stats_display(self):
         if self.current_step == len(self.solution):
             current_state = self.final_state
@@ -306,6 +324,7 @@ Solution Steps:
         )
         self.stats_label.config(text=stats_text)
 
+    # These remain the same for all states
     def update_game_info(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty)
 

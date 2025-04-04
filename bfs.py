@@ -23,6 +23,11 @@ class BirdSortBFS:
 
         self.solve()
 
+    # CONTROLS:
+    # - Previous -> Go a step back (works by Button or Left Arrow Key)
+    # - Next -> Go a step ahead (works by Button or Right Arrow Key)
+    # - Save -> Save Algorithm Execution to a .txt file (works by Button)
+    # - Dynamically changes game statistics
     def create_controls(self):
         control_frame = tk.Frame(self.root, bg="lightgray")
         control_frame.pack(side=tk.TOP, pady=10)
@@ -50,10 +55,12 @@ class BirdSortBFS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    # Saves results to a .txt file
+    # - The result data is specific to the algorithm
     def save_result(self):
         num_colors, num_branches = get_difficulty_settings(self.difficulty) 
 
-        # NAO MEXER NA INDENTAÇÃO DESTA FUNÇÃO POR FAVOR
+        # !!! NAO MEXER NA INDENTAÇÃO DESTA FUNÇÃO POR FAVOR
 
         result_data = f"""Algorithm: BFS
 Difficulty: {self.difficulty}             
@@ -70,6 +77,10 @@ Solution Steps:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")
 
+    # Main Algorithm Function
+    # - Checks for Solution -> Saves collected information in variables
+    # - If no solution was found, a Popup displays a warning message
+    # - If the algorithm doesn't find a solution after a minute, it displays a Popup with a warning
     def solve(self):
         print("Starting BFS...")
         queue = deque([(copy.deepcopy(self.branches), [])])
@@ -78,8 +89,8 @@ Solution Steps:
         iterations = 0
         max_queue_size = 1
         start_time = time.perf_counter()
-        timeout_seconds = 60  # Stop after a minute
-        timed_out = False  # Track whether timeout occurred
+        timeout_seconds = 60  # Algorithm stops running if a minute passes
+        timed_out = False
 
         while queue and iterations < max_iterations:
 
@@ -100,9 +111,9 @@ Solution Steps:
             if self.is_solved(state):
                 end_time = time.perf_counter()
                 self.elapsed_time = end_time - start_time
-                self.solution = moves + [None]  # Append a None step to indicate the final state
-                self.final_state = copy.deepcopy(state)  # Store the final state separately
-                self.total_moves = len(moves)  # Track solution length
+                self.solution = moves + [None] 
+                self.final_state = copy.deepcopy(state) 
+                self.total_moves = len(moves) 
                 self.states_explored = iterations
                 self.max_queue_size = max_queue_size 
                 print(f"Solution found in {iterations} iterations and {self.elapsed_time:.3f} seconds!")
@@ -123,15 +134,17 @@ Solution Steps:
             print(f"No solution found after {iterations} iterations.")
             self.show_no_solution_popup(iterations, timed_out=False)
 
+    # No Solution Popup (two cases)
+    # 1. Solution doesn't exist with this algorithm
+    # 2. 60 second timeout after no solution was found
     def show_no_solution_popup(self, iterations, timed_out=False):
         popup = tk.Toplevel(self.root)
         popup.title("No Solution Found")
         popup.configure(bg="red")
         popup.geometry("280x100")
-        popup.transient(self.root)  # Make popup modal
-        popup.grab_set()  # Ensure popup is focused
+        popup.transient(self.root) 
+        popup.grab_set()
         
-        # Center the popup relative to the main window
         self.root.update_idletasks()
         x = self.root.winfo_x() + (self.root.winfo_width() // 2) - (280 // 2)
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
@@ -152,52 +165,50 @@ Solution Steps:
         popup.lift()  # Raise popup above other windows
         popup.attributes('-topmost', True)  # Force popup to stay on top
 
+    # Check if a branch has exactly 4 birds of the same color
     def is_branch_complete(self, branch):
-        """Check if a branch has exactly 4 birds of the same color"""
         return len(branch) == 4 and all(bird == branch[0] for bird in branch)
 
+    # Remove complete branches from game state (Note: they remain visible)
     def eliminate_complete_branches(self, state):
-        """Remove complete branches from game state"""
         new_state = []
         for branch in state:
             if not self.is_branch_complete(branch):
                 new_state.append(branch)
             else:
-                new_state.append([])  # Replace complete branch with empty branch
+                new_state.append([]) 
         return new_state
 
     def get_possible_moves(self, state):
         moves = []
-        state = [list(branch) for branch in state]  # Convert to mutable lists
+        state = [list(branch) for branch in state] 
         
-        # First eliminate any complete branches
         state = self.eliminate_complete_branches(state)
 
         for i, src in enumerate(state):
             if not src:
-                continue  # Skip empty branches
+                continue
 
             bird_to_move = src[-1]
             move_group = 1
             while move_group < len(src) and src[-(move_group + 1)] == bird_to_move:
-                move_group += 1  # Count consecutive birds of the same color
-
+                move_group += 1 
+                
             for j, dst in enumerate(state):
-                if i != j and len(dst) + move_group <= 4:  # Check 4-bird limit
+                if i != j and len(dst) + move_group <= 4: 
                     if not dst or dst[-1] == bird_to_move:
-                        new_state = copy.deepcopy(state)  # Copy before modifying
-                        birds_moving = new_state[i][-move_group:]  # Take the group
-                        new_state[i] = new_state[i][:-move_group]  # Remove from source
-                        new_state[j].extend(birds_moving)  # Add to destination
+                        new_state = copy.deepcopy(state)
+                        birds_moving = new_state[i][-move_group:]
+                        new_state[i] = new_state[i][:-move_group] 
+                        new_state[j].extend(birds_moving)
                         
-                        # Check if the move created a complete branch
                         new_state = self.eliminate_complete_branches(new_state)
                         moves.append((new_state, (i, j)))
 
         return moves
 
+    # Considers all empty branches as solved
     def is_solved(self, state):
-        """Modified to consider empty branches as solved"""
         return all(len(branch) == 0 for branch in state)
 
     def draw_state(self, state):
@@ -208,37 +219,38 @@ Solution Steps:
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
             
             # Choose the correct branch image based on position
-            if x < 300:  # Left side
+            if x < 300: # Left side
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else: # Right side
                 branch_img = self.game.branch_img_tk
 
-            # Draw the branch
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
-                if x < 300:  # Left branches grow left-to-right
+                if x < 300: # Left branches grow left-to-right
                     bird_x_offset = 5 + i * 50
-                    bird_image = self.game.bird_images[bird + "_flipped"]  # Use flipped version
-                else:  # Right branches grow right-to-left
+                    bird_image = self.game.bird_images[bird + "_flipped"] 
+                else: # Right branches grow right-to-left
                     bird_x_offset = 170 - i * 50
                     bird_image = self.game.bird_images[bird]
 
                 self.game.canvas.create_image(x + bird_x_offset, y - 60, anchor=tk.NW, image=bird_image)
 
+    # INTERFACE CONTROLS - "Go back a step button" is pressed
     def previous_step(self):
         if self.current_step > 0:
             self.current_step -= 1
             self.rebuild_state(self.current_step)
 
+    # INTERFACE CONTROLS - "Go step ahead button" is pressed
     def next_step(self):
         if self.solution and self.current_step < (len(self.solution)-1):
             self.current_step += 1
             self.rebuild_state(self.current_step)
 
+    # Dynamically updates labels at the top of the screen and redraws the game to match current state
     def rebuild_state(self, step):
         if step == len(self.solution):  
-            # If at the final step, just display the solved state
             self.draw_state(self.final_state)
         else:
             current_state = copy.deepcopy(self.branches)
@@ -266,6 +278,7 @@ Solution Steps:
         if self.solution:
             self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
+    # Dynamic Statistics Label  
     def update_stats_display(self):
         if self.current_step == len(self.solution):
             current_state = self.final_state
@@ -282,7 +295,7 @@ Solution Steps:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+                current_state = self.eliminate_complete_branches(current_state) 
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
@@ -293,8 +306,9 @@ Solution Steps:
         )
         self.stats_label.config(text=stats_text)
 
+    # These remain the same for all states
     def update_game_info(self):
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+        num_colors, num_branches = get_difficulty_settings(self.difficulty) 
 
         info_text = f"BFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
