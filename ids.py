@@ -105,8 +105,15 @@ Solution Steps:
         iterations = 0
         total_nodes_generated = [0]
         start_time = time.perf_counter()
+        timeout_seconds = 60  # Stop after a minute
+        timed_out = False  # Track whether timeout occurred
 
         while iterations < max_iterations:
+
+            if time.perf_counter() - start_time > timeout_seconds:
+                timed_out = True
+                break
+
             print(f"Trying depth limit: {max_depth}")
             visited = set()
             result = self.dls(copy.deepcopy(self.branches), 0, max_depth, [], visited, total_nodes_generated)
@@ -128,10 +135,14 @@ Solution Steps:
             iterations += 1
 
         self.solution = None
-        print(f"No solution found within {max_iterations} depth iterations.")
-        self.show_no_solution_popup(iterations)
+        if timed_out:
+            print(f"Search timed out after {iterations} iterations.")
+            self.show_no_solution_popup(iterations, timed_out=True)
+        else:
+            print(f"No solution found after {iterations} iterations.")
+            self.show_no_solution_popup(iterations, timed_out=False)
 
-    def show_no_solution_popup(self, iterations):
+    def show_no_solution_popup(self, iterations, timed_out=False):
         popup = tk.Toplevel(self.root)
         popup.title("No Solution Found")
         popup.configure(bg="red")
@@ -145,7 +156,11 @@ Solution Steps:
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
         popup.geometry(f"280x100+{x}+{y}")
         
-        label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
+        if timed_out:
+            label = tk.Label(popup, text=f"Search timed out after {iterations} iterations.", 
+                         font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
+        else:
+            label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
                          font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
         label.pack(pady=10, padx=10)
 

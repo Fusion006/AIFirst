@@ -35,8 +35,15 @@ class BirdSortWeightedAStar:
         iterations = 0
         max_queue_size = 1
         start_time = time.perf_counter()
+        timeout_seconds = 60  # Stop after a minute
+        timed_out = False  # Track whether timeout occurred
 
         while heap and iterations < max_iterations:
+
+            if time.perf_counter() - start_time > timeout_seconds:
+                timed_out = True
+                break
+
             max_queue_size = max(max_queue_size, len(heap))
             _, _, current_state, moves = heapq.heappop(heap)
             state_tuple = tuple(tuple(branch) for branch in current_state)
@@ -70,10 +77,14 @@ class BirdSortWeightedAStar:
                     heapq.heappush(heap, (f_score, node_count, new_state, moves + [move]))
 
         self.solution = None
-        print(f"No solution found after {iterations} iterations.")
-        self.show_no_solution_popup(iterations)
+        if timed_out:
+            print(f"Search timed out after {iterations} iterations.")
+            self.show_no_solution_popup(iterations, timed_out=True)
+        else:
+            print(f"No solution found after {iterations} iterations.")
+            self.show_no_solution_popup(iterations, timed_out=False)
 
-    def show_no_solution_popup(self, iterations):
+    def show_no_solution_popup(self, iterations, timed_out=False):
         popup = tk.Toplevel(self.root)
         popup.title("No Solution Found")
         popup.configure(bg="red")
@@ -87,7 +98,11 @@ class BirdSortWeightedAStar:
         y = self.root.winfo_y() + (self.root.winfo_height() // 2) - (100 // 2)
         popup.geometry(f"280x100+{x}+{y}")
         
-        label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
+        if timed_out:
+            label = tk.Label(popup, text=f"Search timed out after {iterations} iterations.", 
+                         font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
+        else:
+            label = tk.Label(popup, text=f"No solution found after {iterations} iterations.", 
                          font=("Arial", 12, "bold"), bg="red", fg="white", wraplength=260)
         label.pack(pady=10, padx=10)
 
