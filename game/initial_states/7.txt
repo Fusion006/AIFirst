@@ -1,0 +1,9 @@
+orange blue white green
+red red orange
+yellow cyan orange
+red green blue
+green yellow yellow
+blue cyan blue
+red orange white
+yellow white cyan
+cyan green white

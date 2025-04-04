@@ -66,7 +66,7 @@ def get_optimal_move(branches):
     # Evaluate all possible moves and select the one with the lowest heuristic score
     possible_moves = get_possible_moves(branches)
     if not possible_moves:
-        return None  # No valid moves available
-
+        return None  
+    
     optimal_move = min(possible_moves, key=lambda x: heuristic(x[0]))
     return optimal_move[1]  # Return the (source_index, target_index) of the optimal move

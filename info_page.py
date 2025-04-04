@@ -2,6 +2,9 @@ import tkinter as tk
 from main_menu import MainMenu  
 from PIL import Image, ImageTk
 
+# This Page only has a "Back" button.
+# The Information is displayed through text on the background image for simplicity.
+
 class InfoPage:
     def __init__(self, root):
         self.root = root
@@ -20,7 +23,6 @@ class InfoPage:
         back_button.place(x=10, y=10, width=80, height=40)
 
     def back_to_main_menu(self):
-        """Returns to the Main Menu."""
         self.root.destroy()
         root = tk.Tk()
         MainMenu(root)

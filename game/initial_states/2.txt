@@ -1,0 +1,8 @@
+cyan cyan blue
+blue blue pink
+cyan pink cyan
+pink pink orange
+green blue
+orange green
+green orange
+orange green

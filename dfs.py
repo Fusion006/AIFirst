@@ -64,7 +64,7 @@ Max Depth: {self.max_queue_size}
 Solution Steps:
 """ + "\n".join(f"{i+1}. {step}" for i, step in enumerate(self.solution))
         
-        filename = f"game_states/results/dfs/DFS_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
+        filename = f"game/results/dfs/DFS_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
         with open(filename, "w") as file:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")

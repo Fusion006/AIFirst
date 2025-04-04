@@ -1,5 +1,7 @@
 difficulty_level = 1
 
+# Each of these functions is used to manipulate or collect the current set difficulty
+
 def get_difficulty():
     global difficulty_level
     return difficulty_level
@@ -14,6 +16,8 @@ def reset_difficulty():
     difficulty_level = 1
     print("Difficulty reset to 1")
 
+# According to the difficulty passed as a parameter, 
+# returns the number of birds and branches as a tuple
 def get_difficulty_settings(difficulty):
     difficulty_settings = {
             range(1, 4): (4, 6),      # Levels: 1 2 3      Birds: 4   Branches: 6
@@ -27,7 +31,7 @@ def get_difficulty_settings(difficulty):
             range(25, 28): (8, 10),   # Levels: 25 26 27   Birds: 8   Branches: 10
             range(28, 31): (9, 12),   # Levels: 28 29 30   Birds: 9   Branches: 12
             range(31, 34): (9, 11),   # Levels: 31 32 33   Birds: 9   Branches: 11
-            range(34, 999): (10, 14),  # Levels:  >34      Birds: 10  Branches: 14
+            range(34, 999): (10, 14), # Levels:   >34      Birds: 10  Branches: 14
         }
     for key, value in difficulty_settings.items():
         if difficulty in key:
