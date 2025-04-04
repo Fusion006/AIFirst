@@ -42,7 +42,7 @@ class BirdSortDFS:
         next_button.pack(side=tk.LEFT, padx=5)
         save_button.pack(side=tk.RIGHT, padx=5)
 
-        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Depth = 0", font=("Arial", 12))
+        self.stats_label = tk.Label(self.root, text="Empty Branches = 0, States Explored = 0, Max Depth = 0", font=("Arial", 11))
         self.stats_label.pack(pady=5)
 
         self.game_info_label = tk.Label(self.root, text="", font=("Arial", 12))

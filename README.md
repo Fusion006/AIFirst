@@ -1,5 +1,26 @@
 # Bird Sort 2 - Color Puzzle
 
+Team Info
+Game Description
+Compilation
+Execution
+Code explanation
+Results
+Features
+Art
+
+
+
+
+
+
+
+
+
+
+
+
+
 [Powerpoint checkpoint 1](https://www.canva.com/design/DAGhUuea1a8/CNkov_jamORCYTxVwx-6rA/edit?utm_content=DAGhUuea1a8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
 
 [See Search Problem in Detail](SearchProblem.md)

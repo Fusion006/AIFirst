@@ -32,7 +32,7 @@ class AiSubmenu:
         
         for i, option in enumerate(options):
             if option == "AI Info":
-                self.create_button(570, 675, option, "#6a3a03", self.select_option)
+                self.create_button(560, 675, option, "#6a3a03", self.select_option)
             else:
                 self.create_button(300, 210 + i * 80, option, "#86a340", self.select_option)
         
@@ -79,7 +79,9 @@ class AiSubmenu:
     def custom_difficulty_popup(self, callback):
         popup = tkinter.Toplevel(self.root, background="#48b9d7")
         popup.title(" ")
-        popup.geometry("400x200")
+
+        width, height = 400, 200  # Define popup size
+        center_window(popup, width, height)  # Center the popup
 
         tkinter.Label(popup, text="Select Difficulty", fg="white", font=("Arial", 20, "bold"), background="#48b9d7").pack(pady=10)
         tkinter.Label(popup, text="Enter difficulty level (1-35):", fg="white", font=("Arial", 14), background="#48b9d7").pack(pady=5)

@@ -1,5 +1,6 @@
 from tkinter import Tk, Label, Button, Canvas, font
 from game import BirdSortGame
+from game import center_window
 import tkinter as tk
 from PIL import Image, ImageTk
 from difficulty_manager import difficulty_level
@@ -9,6 +10,7 @@ class MainMenu:
         self.root = root
         self.root.title("Main Menu")
         self.root.geometry("600x800")
+        center_window(self.root)
         image = Image.open("../images/bkg.png")
         self.bg_image = ImageTk.PhotoImage(image)
         

@@ -3,6 +3,21 @@ import random
 from PIL import Image, ImageTk
 from difficulty_manager import increase_difficulty, reset_difficulty, get_difficulty, get_difficulty_settings
 from hint import get_optimal_move
+import os
+
+# GETTER FUNCTION FOR HIGHSCORE
+def get_highscore():
+    highscore_file = "../results/highscore.txt"
+    if os.path.exists(highscore_file):
+        with open(highscore_file, "r") as f:
+            return int(f.read().strip())
+    return 0
+
+# SETTER FUNCTION FOR HIGHSCORE
+def save_highscore(new_score):
+    highscore_file = "../results/highscore.txt"
+    with open(highscore_file, "w") as f:
+        f.write(str(new_score))
 
 def center_window(root, width=600, height=800):
     screen_width = root.winfo_screenwidth()
@@ -51,6 +66,7 @@ class BirdSortGame:
         self.selected_branch = None
         self.highlighted_branch = None
         self.score = 100
+        self.highscore = get_highscore()
         self.init_branches(num_branches)     # Game Maker
         self.draw_game(human_game)           # Game Displayer
         self.create_back_button(difficulty)
@@ -93,6 +109,8 @@ class BirdSortGame:
     # NAVIGATOR FUNCTION 1
     # - return to Main Menu
     def go_back_to_menu(self):
+        if self.score >= self.highscore:  # Save only if new highscore is achieved
+            save_highscore(self.score)
         reset_difficulty() 
         if hasattr(self, "hint_after_id"):
             self.root.after_cancel(self.hint_after_id)
@@ -186,8 +204,10 @@ class BirdSortGame:
     # Game Displayer
     # - After the game was generated with the code above, we display it
     # - Left Side uses flipped art pieces while the Right side uses original ones
-    # - Score and Difficulty are displayed at the top of the screen
+    # - Score, Difficulty, and Highscore are displayed at the top of the screen
     def draw_game(self, human_game):
+        if self.score > self.highscore:
+            self.highscore = self.score
         self.canvas.delete("all")
         self.draw_background()
         
@@ -209,6 +229,7 @@ class BirdSortGame:
         if human_game:
             self.canvas.create_text(300, 28, text=f"Score: {self.score}", font=("Fixedsys", 16, "bold"), fill="black")
             self.canvas.create_text(300, 50, text=f"Difficulty: {get_difficulty()}", font=("Fixedsys", 14, "bold"), fill="black")
+            self.canvas.create_text(300, 72, text=f"Highscore: {self.highscore}", font=("Fixedsys", 12, "bold"), fill="black")
 
     def draw_background(self):
         self.bg_image = ImageTk.PhotoImage(file="../images/background.png") 
@@ -244,7 +265,11 @@ class BirdSortGame:
 
     # On Click, the branch becomes highlighted
     # - This function defines the hitbox for the branches (the area where the birds are is also clickable to improve gameplay)
+    # - Dynamically modfies the highscore whenever score == highscore
     def on_click(self, event):
+        if self.score > self.highscore:
+            self.highscore = self.score
+
         for branch in self.branches:
             if branch["x"] < event.x < branch["x"] + 350 and branch["y"]-50 < event.y < branch["y"] + 30:
                 if self.selected_branch is None:
@@ -267,7 +292,7 @@ class BirdSortGame:
                         self.selected_branch = None
                         self.highlighted_branch = None  # Remove highlight after move
                 break
-
+        
         self.draw_game(True)
         self.check_complete()
     
@@ -327,6 +352,8 @@ class BirdSortGame:
             self.reset_game()  # Restart the game with new settings
             
         def return_to_menu():
+            if self.score >= self.highscore:  # Save only if new highscore is achieved
+                save_highscore(self.score)
             reset_difficulty() 
             popup.destroy()
             self.root.destroy()
