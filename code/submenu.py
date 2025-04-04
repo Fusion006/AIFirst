@@ -16,7 +16,7 @@ class AiSubmenu:
         self.root.title("AI Submenu")
         self.root.geometry("600x800")
         center_window(self.root)
-        image = Image.open("images/bkg_IA.png") 
+        image = Image.open("../images/bkg_IA.png") 
         self.bg_image = ImageTk.PhotoImage(image)
 
         self.canvas = Canvas(root, width=600, height=800)
@@ -39,7 +39,6 @@ class AiSubmenu:
     # NAVIGATOR FUNCTION 1
     # - open Main Menu
     def go_back_to_menu(self):
-        """Returns to the main menu and closes the current game window."""
         self.root.destroy()  
         from main_menu import MainMenu  
         new_root = tkinter.Tk()  
@@ -47,7 +46,6 @@ class AiSubmenu:
         new_root.mainloop()  
 
     def create_button(self, x, y, text, color, command):
-        """Creates a styled button inside the Canvas."""
         btn_font = font.Font(family="Trebuchet MS", size=17, weight="bold")
 
         if text == "AI Info": # Positioned over the sign we added in the background
@@ -72,7 +70,6 @@ class AiSubmenu:
     # Used for Mouse Hovering Effect
     # - Makes the color lighter as the name implies
     def lighten_color(self, color, factor=30):
-        """Lightens the given color slightly for hover effect."""
         r, g, b = int(color[1:3], 16), int(color[3:5], 16), int(color[5:7], 16)
         return f'#{min(r+factor, 255):02x}{min(g+factor, 255):02x}{min(b+factor, 255):02x}'
 

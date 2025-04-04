@@ -72,7 +72,7 @@ Nodes Generated: {self.nodes_generated}
 Solution Steps:
 """ + "\n".join(f"{i+1}. {step}" for i, step in enumerate(self.solution))
         
-        filename = f"game/results/ids/IDS_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
+        filename = f"../results/ids/IDS_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
         with open(filename, "w") as file:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")

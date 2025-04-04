@@ -10,7 +10,7 @@ class InfoPage:
         self.root = root
         self.root.title("Project Information")
         self.root.geometry("600x800")
-        image = Image.open("images/about_us.png") 
+        image = Image.open("../images/about_us.png") 
         self.bg_image = ImageTk.PhotoImage(image) 
         self.canvas = tk.Canvas(root, width=600, height=800)
         self.canvas.pack(fill="both", expand=True)

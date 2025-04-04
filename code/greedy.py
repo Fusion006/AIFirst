@@ -71,7 +71,7 @@ Avg Branching Factor (~ moves/step)= {self.avg_branching_factor:.2f}
 Solution Steps:
 """ + "\n".join(f"{i+1}. {step}" for i, step in enumerate(self.solution))
         
-        filename = f"game/results/greedy/GREEDY_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
+        filename = f"../results/greedy/GREEDY_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
         with open(filename, "w") as file:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")

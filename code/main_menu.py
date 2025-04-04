@@ -9,7 +9,7 @@ class MainMenu:
         self.root = root
         self.root.title("Main Menu")
         self.root.geometry("600x800")
-        image = Image.open("images/bkg.png")
+        image = Image.open("../images/bkg.png")
         self.bg_image = ImageTk.PhotoImage(image)
         
         self.difficulty = difficulty_level

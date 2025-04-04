@@ -18,8 +18,8 @@ difficulty_levels = {
 
 bird_colors = ["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cyan", "brown"]
 
-os.makedirs("game/initial_states", exist_ok=True)
-os.makedirs("game/mid_states", exist_ok=True)
+os.makedirs("../states/initial_states", exist_ok=True)
+os.makedirs("../states/mid_states", exist_ok=True)
 
 # Solvable Initial State Generator
 # - Follows similar logic as the normal level maker
@@ -53,10 +53,10 @@ def generate_mid_state(initial_state):
 for i, (level_range, (num_colors, num_branches)) in enumerate(difficulty_levels.items(), start=1):
     initial_state = generate_initial_state(num_colors, num_branches)
     mid_state = generate_mid_state(initial_state)
-    with open(f"game/initial_states/{i}.txt", "w") as f:
+    with open(f"../states/initial_states/{i}.txt", "w") as f:
         for branch in initial_state:
             f.write(" ".join(branch) + "\n")
-    with open(f"game/mid_states/{i}.txt", "w") as f:
+    with open(f"../states/mid_states/{i}.txt", "w") as f:
         for branch in mid_state:
             f.write(" ".join(branch) + "\n")
 

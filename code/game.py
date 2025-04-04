@@ -27,9 +27,9 @@ class BirdSortGame:
         self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cyan", "brown"], num_colors)
         self.bird_images = {}
         
-        self.branch_img = Image.open("images/branch.png").resize((250, 30), Image.Resampling.LANCZOS)
+        self.branch_img = Image.open("../images/branch.png").resize((250, 30), Image.Resampling.LANCZOS)
         # Highlighted Branch is used whenever we click on a branch to improve the game's interface
-        self.highlighted_branch_img = Image.open("images/branch_highlighted.png").resize((250, 30), Image.Resampling.LANCZOS)
+        self.highlighted_branch_img = Image.open("../images/branch_highlighted.png").resize((250, 30), Image.Resampling.LANCZOS)
 
         # Images were all drawn facing left, so we simply flip them to face the right, so they can be used on the left side of the screen.
         # Thanks to this, all art pieces will be "facing" the middle of the screen.
@@ -43,7 +43,7 @@ class BirdSortGame:
 
         # Bird Scaler (they become bigger to improve interface)
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)  
+            img = Image.open(f"../images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)  
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
         
@@ -88,12 +88,14 @@ class BirdSortGame:
 
         hint_box = self.canvas.create_rectangle(125, 700, 475, 750, fill="#7cbd76", outline="black")
         hint_text_item = self.canvas.create_text(300, 725, text=hint_text, font=("Arial", 12, "bold"), fill="black")
-        self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))
+        self.hint_after_id = self.root.after(4000, lambda: self.canvas.delete(hint_box, hint_text_item))
 
     # NAVIGATOR FUNCTION 1
     # - return to Main Menu
     def go_back_to_menu(self):
         reset_difficulty() 
+        if hasattr(self, "hint_after_id"):
+            self.root.after_cancel(self.hint_after_id)
         self.root.destroy()  
         from main_menu import MainMenu  
         new_root = tk.Tk()  
@@ -103,7 +105,7 @@ class BirdSortGame:
     # NAVIGATOR FUNCTION 2
     # - return to AI Menu
     def go_back_to_ai_menu(self):
-        reset_difficulty() 
+        reset_difficulty()
         self.root.destroy()  
         from submenu import AiSubmenu 
         new_root = tk.Tk()  
@@ -209,7 +211,7 @@ class BirdSortGame:
             self.canvas.create_text(300, 50, text=f"Difficulty: {get_difficulty()}", font=("Fixedsys", 14, "bold"), fill="black")
 
     def draw_background(self):
-        self.bg_image = ImageTk.PhotoImage(file="images/background.png") 
+        self.bg_image = ImageTk.PhotoImage(file="../images/background.png") 
         self.canvas.create_image(0, 0, anchor=tk.NW, image=self.bg_image)  
         
 
@@ -303,7 +305,7 @@ class BirdSortGame:
         # Reload bird images
         self.bird_images.clear()
         for color in self.bird_colors:
-            img = Image.open(f"images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)
+            img = Image.open(f"../images/{color}_bird.png").resize((75, 75), Image.Resampling.LANCZOS)
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))
 

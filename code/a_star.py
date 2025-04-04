@@ -72,7 +72,7 @@ Max Queue Size: {self.max_queue_size}
 Solution Steps:
 """ + "\n".join(f"{i+1}. {step}" for i, step in enumerate(self.solution))
         
-        filename = f"game/results/astar/ASTAR_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
+        filename = f"../results/astar/ASTAR_difficulty={self.difficulty}_exectime={self.elapsed_time:.5f}.txt"
         with open(filename, "w") as file:
             file.write(result_data)
         messagebox.showinfo("Saved", f"Results saved to {filename}")
@@ -310,7 +310,7 @@ Solution Steps:
         if self.solution:
             self.step_label.config(text=f"Step: {self.current_step}/{len(self.solution)-1}")
 
-    # Dynamic Statistics Label    
+    # Dynamic Statistics Label
     def update_stats_display(self):
         if self.current_step == len(self.solution):
             current_state = self.final_state
