@@ -14,7 +14,7 @@ class BirdSortGreedy:
         self.difficulty = difficulty
         self.create_controls()
         self.game = BirdSortGame(root, difficulty)
-        self.game.root.unbind("<Button-1>")  # Disable manual play
+        self.game.root.unbind("<Button-1>") # Disable manual play
 
         self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
@@ -162,8 +162,8 @@ Solution Steps:
                                  bg="white", fg="black")
         close_button.pack(pady=5)
         
-        popup.lift()  # Raise popup above other windows
-        popup.attributes('-topmost', True)  # Force popup to stay on top
+        popup.lift()
+        popup.attributes('-topmost', True)
 
     def heuristic(self, state):
         """Heuristic function to evaluate the state"""
@@ -174,15 +174,15 @@ Solution Steps:
 
             colors = set(branch)
             if len(colors) > 1:
-                score += len(colors) * 2  # Penalty for mixed colors
+                score += len(colors) * 2 # Penalty for mixed colors
 
             if len(colors) == 1:
-                score -= (len(branch) / 4) * 3  # Reward for nearly complete branches
+                score -= (len(branch) / 4) * 3 # Reward for nearly complete branches
 
             for color in colors:
                 color_count = branch.count(color)
                 if color_count < 4:
-                    score += (4 - color_count)  # Penalty for scattered birds
+                    score += (4 - color_count) # Penalty for scattered birds
 
         return score
 

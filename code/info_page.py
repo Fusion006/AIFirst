@@ -1,6 +1,7 @@
 import tkinter as tk
 from main_menu import MainMenu  
 from PIL import Image, ImageTk
+from game import center_window
 
 # This Page only has a "Back" button.
 # The Information is displayed through text on the background image for simplicity.
@@ -10,6 +11,7 @@ class InfoPage:
         self.root = root
         self.root.title("Project Information")
         self.root.geometry("600x800")
+        center_window(self.root)
         image = Image.open("../images/about_us.png") 
         self.bg_image = ImageTk.PhotoImage(image) 
         self.canvas = tk.Canvas(root, width=600, height=800)

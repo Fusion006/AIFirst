@@ -16,7 +16,7 @@ class BirdSortWeightedAStar:
         self.difficulty = difficulty
         self.create_controls()
         self.game = BirdSortGame(root, difficulty)
-        self.game.root.unbind("<Button-1>")  # Disable manual play
+        self.game.root.unbind("<Button-1>") # Disable manual play
 
         self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
@@ -31,7 +31,7 @@ class BirdSortWeightedAStar:
     def solve(self):
         print("Starting Weighted A* search...")
         start_state = copy.deepcopy(self.branches)
-        start_node = (0, 0, start_state, [])  # (f_score, node_count, state, moves)
+        start_node = (0, 0, start_state, []) # (f_score, node_count, state, moves)
         visited = set()
         heap = [start_node]
         node_count = 1
@@ -116,8 +116,8 @@ class BirdSortWeightedAStar:
                                  bg="white", fg="black")
         close_button.pack(pady=5)
         
-        popup.lift()  # Raise popup above other windows
-        popup.attributes('-topmost', True)  # Force popup to stay on top
+        popup.lift()
+        popup.attributes('-topmost', True)
 
     # These remain the same for all states
     def update_game_info(self):

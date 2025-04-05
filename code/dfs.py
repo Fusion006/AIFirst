@@ -14,7 +14,7 @@ class BirdSortDFS:
         self.difficulty = difficulty
         self.create_controls()
         self.game = BirdSortGame(root, difficulty)
-        self.game.root.unbind("<Button-1>")  # Disable manual play
+        self.game.root.unbind("<Button-1>") # Disable manual play
 
         self.branches = [list(branch["birds"]) for branch in self.game.branches] 
         self.solution = []
@@ -97,8 +97,8 @@ Solution Steps:
                 timed_out = True
                 break
 
-            state, moves, depth = stack.pop()  # DFS -> LIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
+            state, moves, depth = stack.pop() # DFS -> LIFO
+            state_tuple = tuple(tuple(branch) for branch in state) # Hashable state
 
             if state_tuple in visited:
                 continue
@@ -162,8 +162,8 @@ Solution Steps:
                                  bg="white", fg="black")
         close_button.pack(pady=5)
         
-        popup.lift()  # Raise popup above other windows
-        popup.attributes('-topmost', True)  # Force popup to stay on top
+        popup.lift()
+        popup.attributes('-topmost', True)
 
     # Considers all empty branches as solved
     def is_solved(self, state):
@@ -217,19 +217,19 @@ Solution Steps:
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
             # Choose the correct branch image based on position
-            if x < 300:  # Left side
+            if x < 300: # Left side
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else: # Right side
                 branch_img = self.game.branch_img_tk
 
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
                 # Choose the correct branch image based on position
-                if x < 300:  # Left branches grow left-to-right
+                if x < 300: # Left branches grow left-to-right
                     bird_x_offset = 5 + i * 50
                     bird_image = self.game.bird_images[bird + "_flipped"]
-                else:  # Right branches grow right-to-left
+                else: # Right branches grow right-to-left
                     bird_x_offset = 170 - i * 50
                     bird_image = self.game.bird_images[bird]
 
@@ -293,7 +293,7 @@ Solution Steps:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+                current_state = self.eliminate_complete_branches(current_state) # Update for eliminated branches
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
@@ -306,7 +306,7 @@ Solution Steps:
 
     # These remain the same for all states
     def update_game_info(self):
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+        num_colors, num_branches = get_difficulty_settings(self.difficulty) # Get values from function
 
         info_text = f"DFS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)

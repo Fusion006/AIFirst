@@ -89,7 +89,7 @@ Solution Steps:
         iterations = 0
         max_queue_size = 1
         start_time = time.perf_counter()
-        timeout_seconds = 60  # Algorithm stops running if a minute passes
+        timeout_seconds = 60 # Algorithm stops running if a minute passes
         timed_out = False
 
         while queue and iterations < max_iterations:
@@ -99,8 +99,8 @@ Solution Steps:
                 break
 
             max_queue_size = max(max_queue_size, len(queue)) 
-            state, moves = queue.popleft()  # BFS -> FIFO
-            state_tuple = tuple(tuple(branch) for branch in state)  # Hashable state
+            state, moves = queue.popleft() # BFS -> FIFO
+            state_tuple = tuple(tuple(branch) for branch in state) # Hashable state
 
             if state_tuple in visited:
                 continue
@@ -162,8 +162,8 @@ Solution Steps:
                                  bg="white", fg="black")
         close_button.pack(pady=5)
         
-        popup.lift()  # Raise popup above other windows
-        popup.attributes('-topmost', True)  # Force popup to stay on top
+        popup.lift() 
+        popup.attributes('-topmost', True)
 
     # Check if a branch has exactly 4 birds of the same color
     def is_branch_complete(self, branch):

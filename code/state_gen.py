@@ -39,12 +39,12 @@ def generate_mid_state(initial_state):
     # 50% chance to create a partially solved state
     if random.random() < 0.5:
         for branch in modified_state:
-            if branch and random.random() < 0.4:  # 40% chance to sort a branch
+            if branch and random.random() < 0.4: # 40% chance to sort a branch
                 branch.sort()
     # 50% chance to remove some birds (simulate missing colors)
     else:
         for branch in modified_state:
-            if branch and random.random() < 0.3:  # 30% chance to remove some birds
+            if branch and random.random() < 0.3: # 30% chance to remove some birds
                 branch.pop()
     return modified_state
 
