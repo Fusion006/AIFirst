@@ -1,6 +1,6 @@
-purple cyan cyan
-red cyan red
-green green purple
-cyan red purple
-green purple
-green red
+brown purple cyan
+purple brown purple
+purple cyan red
+red brown red
+cyan cyan
+red brown

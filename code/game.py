@@ -6,12 +6,16 @@ from hint import get_optimal_move
 import os
 
 # GETTER FUNCTION FOR HIGHSCORE
+# - If the file gets lost, its automatically repaired
 def get_highscore():
     highscore_file = "../results/highscore.txt"
-    if os.path.exists(highscore_file):
-        with open(highscore_file, "r") as f:
-            return int(f.read().strip())
-    return 0
+    if not os.path.exists(highscore_file):
+        os.makedirs(os.path.dirname(highscore_file), exist_ok=True)
+        with open(highscore_file, "w") as f:
+            f.write("100")
+        return 100
+    with open(highscore_file, "r") as f:
+        return int(f.read().strip())
 
 # SETTER FUNCTION FOR HIGHSCORE
 def save_highscore(new_score):
@@ -27,11 +31,12 @@ def center_window(root, width=600, height=800):
     root.geometry(f"{width}x{height}+{x}+{y}")
 
 class BirdSortGame:
-    def __init__(self, root, difficulty=None):
+    def __init__(self, root, difficulty=None, custom_branches=None):
         self.root = root
         self.root.title("Bird Sort Game")
         self.difficulty = difficulty if difficulty else get_difficulty()
-        human_game = False if difficulty else True
+        human_game = False if difficulty or custom_branches else True
+
         if human_game == False: # Since AI algorithms have labels at the top of the screen, we made the window bigger to fit the labels and the canvas
             width = 600
             height = 1000
@@ -42,9 +47,26 @@ class BirdSortGame:
             self.canvas = tk.Canvas(root, width=600, height=800, bg="#87CEFA")
         self.canvas.pack()
         
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)
+        self.branches = []
 
-        self.bird_colors = random.sample(["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cyan", "brown"], num_colors)
+        # Setup branches early if loading from file
+        if custom_branches:
+            # Extract unique bird colors from the raw list of lists
+            bird_set = set()
+            for branch in custom_branches:
+                bird_set.update(branch)
+            self.bird_colors = list(bird_set)
+
+            # Now build proper branch dicts with x/y
+            self.init_custom_branches(custom_branches)
+            num_branches = len(self.branches)
+        else:
+            num_colors, num_branches = get_difficulty_settings(self.difficulty)
+            self.bird_colors = random.sample(
+                ["red", "green", "blue", "yellow", "orange", "purple", "pink", "white", "cyan", "brown"],
+                num_colors
+            )
+
         self.bird_images = {}
         
         self.branch_img = Image.open("../images/branch.png").resize((250, 30), Image.Resampling.LANCZOS)
@@ -67,14 +89,17 @@ class BirdSortGame:
             self.bird_images[color] = ImageTk.PhotoImage(img)
             self.bird_images[color + "_flipped"] = ImageTk.PhotoImage(img.transpose(Image.FLIP_LEFT_RIGHT))  
         
-        self.branches = []
         self.selected_branch = None
         self.highlighted_branch = None
         self.score = 100
         self.highscore = get_highscore()
-        self.init_branches(num_branches)     # Game Maker
-        self.draw_game(human_game)           # Game Displayer
-        self.create_back_button(difficulty)
+
+        # Game Maker
+        if not custom_branches:
+            self.init_branches(num_branches)
+        # Game Displayer
+        self.draw_game(human_game)
+        self.create_back_button(human_game)
         
         if human_game:
             self.create_hint_button()
@@ -151,16 +176,58 @@ class BirdSortGame:
         AiSubmenu(new_root)
         new_root.mainloop() 
 
-    def create_back_button(self, difficulty=None):
-        if difficulty: # this is for AI algorithms (only change is in bg color)
+    def create_back_button(self, human_game):
+        if not human_game:
             self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_ai_menu, borderwidth=0, highlightthickness=0, fg="black")
         else:
             self.back_button = tk.Button(self.root, text="←", font=("Fixedsys", 12, "bold"), command=self.go_back_to_menu, borderwidth=0, highlightthickness=0, bg="#48b9d7", fg="black")
         self.back_button.place(x=10, y=10) 
 
-    # Game Maker
+    # GAME MAKER 1
     # - This function is responsible for distributing the birds along the branches
-    # - It creates solvable games (unsolvable are discarded and regenerated)
+    # - It defines the game according to branches read from a .txt file
+    def init_custom_branches(self, custom_branches):
+        self.branches.clear()
+
+        self.num_per_side = len(custom_branches) // 2
+        self.num_left = self.num_per_side
+        self.num_right = len(custom_branches) - self.num_left
+
+        def generate_branch_positions():
+            screen_height = 750
+            branch_spacing = 100
+            total_branch_height = (self.num_per_side - 1) * branch_spacing
+            start_y1 = max(125, (screen_height - total_branch_height) // 2)
+            start_y2 = start_y1 + random.choice([-10, -5, 10, 20])
+
+            y1_positions = [start_y1 + (i * branch_spacing) for i in range(self.num_left)]
+            y2_positions = [start_y2 + (i * branch_spacing) for i in range(self.num_right)]
+
+            y1_positions = [y for y in y1_positions if y <= 800]
+            y2_positions = [y for y in y2_positions if y <= 800]
+
+            left_branches = [(0, y) for y in y1_positions]
+            right_branches = [(350, y) for y in y2_positions]
+            return left_branches + right_branches
+
+        positions = generate_branch_positions()[:len(custom_branches)]
+        self.branches = [{"x": x, "y": y, "birds": birds[:]} for (x, y), birds in zip(positions, custom_branches)]
+
+        # Build branch labels
+        self.branch_labels = {}
+        left_index = 1
+        right_index = 1
+        for idx, branch in enumerate(self.branches):
+            if branch["x"] < 300:
+                self.branch_labels[idx] = f"L{left_index}"
+                left_index += 1
+            else:
+                self.branch_labels[idx] = f"R{right_index}"
+                right_index += 1
+
+    # GAME MAKER 2
+    # - This function is responsible for distributing the birds along the branches
+    # - It generates solvable games (unsolvable are discarded and regenerated)
     def init_branches(self, num_branches):
         self.branches.clear()
 
@@ -184,12 +251,9 @@ class BirdSortGame:
             # Generate positions
             y1_positions = [start_y1 + (i * branch_spacing) for i in range(num_left)]
             y2_positions = [start_y2 + (i * branch_spacing) for i in range(num_right)]
-            print(num_per_side, num_left, num_right, total_branch_height)
-            print(y1_positions, y2_positions)
             # Ensure branches don't exceed the bottom of the screen
             y1_positions = [y for y in y1_positions if y <= 800]
             y2_positions = [y for y in y2_positions if y <= 800]
-            print(y1_positions, y2_positions)
             left_branches = [(0, y) for y in y1_positions]
             right_branches = [(350, y) for y in y2_positions]
 

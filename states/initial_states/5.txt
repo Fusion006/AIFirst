@@ -1,8 +1,8 @@
-purple brown blue
-yellow white purple
-blue white purple
-purple green yellow
-yellow white blue
-brown brown green
-blue green green
-yellow white brown
+white cyan green
+white brown brown
+brown orange green
+brown orange pink
+pink orange pink
+green orange pink
+green cyan cyan
+white white cyan

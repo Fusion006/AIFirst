@@ -1,7 +1,7 @@
-brown red red
-yellow cyan yellow
-red green cyan
-green red brown
-yellow green cyan
+pink blue yellow
+brown yellow pink
 green brown brown
-yellow cyan
+blue yellow brown
+yellow pink blue
+blue green green
+green pink

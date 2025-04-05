@@ -102,7 +102,7 @@ class AiSubmenu:
             except ValueError:
                 error_label.config(text="⚠️ Invalid input! Please enter a number.")
 
-        tkinter.Button(popup, text="Confirm", font=("Arial", 14), background="white", borderwidth=0, highlightthickness=0, command=submit).pack(pady=5)
+        tkinter.Button(popup, text="Confirm", font=("Arial", 14), background="white", highlightthickness=0, command=submit).pack(pady=5)
         popup.transient(self.root)
         popup.after(10, lambda: popup.grab_set())
         self.root.wait_window(popup)
@@ -132,7 +132,7 @@ class AiSubmenu:
                 width, height = 400, 200
                 center_window(popup, width, height)
 
-                tkinter.Label(popup, text="Choose Puzzle Source", fg="white", font=("Arial", 18, "bold"), background="#48b9d7").pack(pady=10)
+                tkinter.Label(popup, text="Choose Game Source", fg="white", font=("Arial", 18, "bold"), background="#48b9d7").pack(pady=10)
 
                 def from_difficulty():
                     popup.destroy()
@@ -142,8 +142,8 @@ class AiSubmenu:
                     popup.destroy()
                     self.select_file_source(option)
 
-                tkinter.Button(popup, text="Generate by Difficulty", font=("Arial", 14), command=from_difficulty).pack(pady=10)
-                tkinter.Button(popup, text="Load from File", font=("Arial", 14), command=from_file).pack(pady=5)
+                tkinter.Button(popup, text="Generate by Difficulty", font=("Arial", 14), background="white", highlightthickness=0, command=from_difficulty).pack(pady=10)
+                tkinter.Button(popup, text="Load from File", font=("Arial", 14), background="white", highlightthickness=0, command=from_file).pack(pady=5)
 
                 popup.transient(self.root)
                 popup.after(10, lambda: popup.grab_set())
@@ -160,14 +160,24 @@ class AiSubmenu:
 
         def load_file(folder):
             popup.destroy()
-            folder_path = os.path.join("states", folder)
-            file_path = filedialog.askopenfilename(initialdir=folder_path, title="Select a file",
-                                                    filetypes=(("Text files", "*.txt"),))
+            temp_root = tkinter.Toplevel(self.root)
+            temp_root.withdraw()  
+            center_window(temp_root, 1, 1) 
+
+            folder_path = os.path.abspath(os.path.join("..", "states", folder))
+            file_path = filedialog.askopenfilename(
+                parent=temp_root,
+                initialdir=folder_path,
+                title="Select a file",
+                filetypes=(("Text files", "*.txt"),)
+            )
+            temp_root.destroy() 
+
             if file_path:
                 self.start_ai(algorithm, file_path)
 
-        tkinter.Button(popup, text="Initial States", font=("Arial", 14), command=lambda: load_file("initial_states")).pack(pady=5)
-        tkinter.Button(popup, text="Mid States", font=("Arial", 14), command=lambda: load_file("mid_states")).pack(pady=5)
+        tkinter.Button(popup, text="Initial States", font=("Arial", 14), background="white", highlightthickness=0, command=lambda: load_file("initial_states")).pack(pady=5)
+        tkinter.Button(popup, text="Mid States", font=("Arial", 14), background="white", highlightthickness=0, command=lambda: load_file("mid_states")).pack(pady=5)
 
         popup.transient(self.root)
         popup.after(10, lambda: popup.grab_set())
