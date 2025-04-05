@@ -23,15 +23,15 @@ def get_optimal_move(branches):
 
             colors = set(branch)
             if len(colors) > 1:
-                score += len(colors) * 2  # Penalty for mixed colors
+                score += len(colors) * 2 # Penalty for mixed colors
 
             if len(colors) == 1:
-                score -= (len(branch) / 4) * 3  # Reward for nearly complete branches
+                score -= (len(branch) / 4) * 3 # Reward for nearly complete branches
 
             for color in colors:
                 color_count = branch.count(color)
                 if color_count < 4:
-                    score += (4 - color_count)  # Penalty for scattered birds
+                    score += (4 - color_count) # Penalty for scattered birds
 
         return score
 
@@ -63,10 +63,10 @@ def get_optimal_move(branches):
 
         return moves
 
-    # Evaluate all possible moves and select the one with the lowest heuristic score
+    # Evaluates all possible moves and select the one with the lowest heuristic score
     possible_moves = get_possible_moves(branches)
     if not possible_moves:
         return None  
     
     optimal_move = min(possible_moves, key=lambda x: heuristic(x[0]))
-    return optimal_move[1]  # Return the (source_index, target_index) of the optimal move
+    return optimal_move[1] # Returns (source_index, target_index) of the optimal move

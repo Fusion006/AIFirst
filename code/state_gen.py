@@ -32,27 +32,37 @@ def generate_initial_state(num_colors, num_branches):
         branches[i % num_branches].append(bird)
     return branches
 
+# Helper to apply a move (from, to) safely
+def apply_move(branches, from_idx, to_idx):
+    if branches[from_idx]:
+        bird = branches[from_idx].pop()
+        branches[to_idx].append(bird)
+
 # Mid State Generator
 # - Modifies initial states
-def generate_mid_state(initial_state):
-    modified_state = [list(branch) for branch in initial_state]
-    # 50% chance to create a partially solved state
-    if random.random() < 0.5:
-        for branch in modified_state:
-            if branch and random.random() < 0.4:  # 40% chance to sort a branch
-                branch.sort()
-    # 50% chance to remove some birds (simulate missing colors)
-    else:
-        for branch in modified_state:
-            if branch and random.random() < 0.3:  # 30% chance to remove some birds
-                branch.pop()
-    return modified_state
+def generate_mid_state(initial_state, num_moves=3):
+    state = [list(branch) for branch in initial_state]
+
+    for _ in range(num_moves):
+        non_empty = [i for i, b in enumerate(state) if b]
+        non_full = [i for i, b in enumerate(state) if len(b) < 4]
+
+        # Prevent invalid moves
+        movable_pairs = [(f, t) for f in non_empty for t in non_full if f != t]
+        if not movable_pairs:
+            break
+
+        from_idx, to_idx = random.choice(movable_pairs)
+        apply_move(state, from_idx, to_idx)
+
+    return state
 
 # File Maker
 # - Will take states created above and save them on text files (/game dir)
 for i, (level_range, (num_colors, num_branches)) in enumerate(difficulty_levels.items(), start=1):
     initial_state = generate_initial_state(num_colors, num_branches)
-    mid_state = generate_mid_state(initial_state)
+    num_moves = random.randint(num_branches // 2, num_branches)
+    mid_state = generate_mid_state(initial_state, num_moves=num_moves)
     with open(f"../states/initial_states/{i}.txt", "w") as f:
         for branch in initial_state:
             f.write(" ".join(branch) + "\n")

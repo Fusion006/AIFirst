@@ -4,6 +4,8 @@ import time
 from game import BirdSortGame, center_window
 from difficulty_manager import get_difficulty_settings
 from tkinter import messagebox
+import os
+import re
 
 class BirdSortIDS:
     def __init__(self, root, difficulty):
@@ -12,9 +14,20 @@ class BirdSortIDS:
         center_window(self.root)
 
         self.difficulty = difficulty
-        self.create_controls()
-        self.game = BirdSortGame(root, difficulty)
-        self.game.root.unbind("<Button-1>")  # Disable manual play
+
+        # Check if difficulty is a file path (string)
+        if isinstance(difficulty, str) and difficulty.endswith(".txt"):
+            self.branches = self.load_branches_from_file(difficulty)
+            # Get state type and number
+            self.difficulty = self.extract_state_id(difficulty)
+            self.create_controls()
+            self.game = BirdSortGame(root, custom_branches=self.branches)
+        # Or an integer
+        else:
+            self.create_controls()
+            self.game = BirdSortGame(root, difficulty)
+            self.branches = [list(branch["birds"]) for branch in self.game.branches]
+        self.game.root.unbind("<Button-1>") # Disable manual play
 
         self.branches = [list(branch["birds"]) for branch in self.game.branches]
         self.solution = []
@@ -22,6 +35,23 @@ class BirdSortIDS:
 
         self.solve()
 
+    # State Type and File Number Extractor
+    # - According to state type and path, it cleans it up to be easier to read on the interface
+    def extract_state_id(self, path):
+        match = re.search(r'(initial_states|mid_states)/(\d+)\.txt$', path)
+        
+        if match:
+            state_type = match.group(1)
+            number = match.group(2)
+            
+            if "initial_states" in state_type:
+                return f"Init{number}"
+            elif "mid_states" in state_type:
+                return f"Mid{number}"
+        
+        filename = os.path.basename(path)
+        return os.path.splitext(filename)[0]
+    
     # CONTROLS:
     # - Previous -> Go a step back (works by Button or Left Arrow Key)
     # - Next -> Go a step ahead (works by Button or Right Arrow Key)
@@ -54,6 +84,16 @@ class BirdSortIDS:
         self.root.bind("<Right>", lambda e: self.next_step())
         self.root.bind("<space>", lambda e: self.next_step())
 
+    # Loads results from a .txt file
+    # - This is used whenever the user chooses to run an algorithm based on a file and not a difficulty
+    def load_branches_from_file(self, filepath):
+        branches = []
+        with open(filepath, "r") as f:
+            for line in f:
+                birds = line.strip().split()
+                branches.append(birds)
+        return branches
+    
     # Saves results to a .txt file
     # - The result data is specific to the algorithm
     def save_result(self):
@@ -250,19 +290,19 @@ Solution Steps:
         for index, branch in enumerate(state):
             x, y = self.game.branches[index]["x"], self.game.branches[index]["y"]
             # Choose the correct branch image based on position
-            if x < 300:  # Left side
+            if x < 300: # Left side
                 branch_img = self.game.branch_img_left_tk
-            else:  # Right side
+            else: # Right side
                 branch_img = self.game.branch_img_tk
 
             self.game.canvas.create_image(x, y, anchor=tk.NW, image=branch_img)
 
             for i, bird in enumerate(branch):
                 # Choose the correct branch image based on position
-                if x < 300:  # Left branches grow left-to-right
+                if x < 300: # Left branches grow left-to-right
                     bird_x_offset = 5 + i * 50
                     bird_image = self.game.bird_images[bird + "_flipped"] 
-                else:  # Right branches grow right-to-left
+                else: # Right branches grow right-to-left
                     bird_x_offset = 170 - i * 50
                     bird_image = self.game.bird_images[bird]
 
@@ -328,7 +368,7 @@ Solution Steps:
                 birds_moving = current_state[src_idx][-move_group:]
                 current_state[src_idx] = current_state[src_idx][:-move_group]
                 current_state[dst_idx].extend(birds_moving)
-                current_state = self.eliminate_complete_branches(current_state)  # Update for eliminated branches
+                current_state = self.eliminate_complete_branches(current_state) # Update for eliminated branches
 
         empty_branches = sum(1 for branch in current_state if len(branch) == 0)
         stats_text = (
@@ -341,7 +381,7 @@ Solution Steps:
 
     # These remain the same for all states
     def update_game_info(self):
-        num_colors, num_branches = get_difficulty_settings(self.difficulty)  # Get values from function
+        num_colors, num_branches = get_difficulty_settings(self.difficulty) # Get values from function
 
         info_text = f"Algorithm: IDS, Difficulty: {self.difficulty}, Colors: {num_colors}, Branches: {num_branches}"
         self.game_info_label.config(text=info_text)
