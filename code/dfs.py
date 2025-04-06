@@ -128,7 +128,7 @@ Solution Steps:
         iterations = 0
         max_depth = 0
         start_time = time.perf_counter()
-        timeout_seconds = 60 # Algorithm stops running if a minute passes
+        timeout_seconds = 300 # Algorithm stops running if a five minutes pass
         timed_out = False
 
         while stack and iterations < max_iterations:
