@@ -32,10 +32,10 @@ Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Yo
 ## Rules
 In order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
 
-### Branch Space:
+### Branch Space
 Each branch can hold up to 4 birds. If all birds in a branch are of the same color, that color along with this branch are removed from the puzzle.
 
-### Moving a Bird:
+### Moving a Bird
 To move a bird from one branch to another:
 - The **destination branch** must either be **empty** or have **enough space**.
 - If not empty, the **top bird** on the destination branch must be the **same color** as the bird being moved.
@@ -45,7 +45,7 @@ To move a bird from one branch to another:
   <em>Figure 2: Moving a single bird</em>
 </div>
 
-### Moving a Group of Birds:
+### Moving a Group of Birds
 This rule follows the same principles as above, with one addition:
 - Birds of the **same color**, if **stacked together**, **must move together** as a group.
 - The destination must be either empty or have **enough space for the entire group**.
@@ -55,7 +55,7 @@ This rule follows the same principles as above, with one addition:
   <em>Figure 3: Moving a group of birds</em>
 </div>
 
-### Forming a Sequence:
+### Forming a Sequence
 - Once **4 birds of the same color** are placed on the same branch, that branch **breaks**, increasing the player’s score.
 - As mentioned in the first rule, both the **branch** and the **birds** are removed from the puzzle.
 
@@ -75,7 +75,7 @@ A level is completed when all branches have been cleared by correctly grouping a
 ## Setup and Execution
 Before running the game, ensure your environment is properly configured. Follow the steps below to install the necessary tools and dependencies.
 
-### Requirements:
+### Requirements
 
 - **Python 3.10 or higher**  
   - Download it from the [official Python website](https://www.python.org/downloads/)
@@ -119,7 +119,7 @@ To execute the game, navigate to **/code** and simply run `python3 main_menu.py`
 - **Challenging Yet Accessible**
   - Easy to learn, difficult to master — with increasing complexity at higher levels.
 
-### AI Features
+## AI Features
 
 - **Multiple Algorithms**
   - Includes a variety of AI approaches to solve puzzles (DFS, BFS, A*, and more!)
