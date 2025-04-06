@@ -16,7 +16,7 @@
   - [Requirements](#requirements)
   - [Execution](#execution)
 - [Features](#features)
-  - [AI Features](#ai-features)
+- [AI Features](#ai-features)
 - [Code](#code)
 - [Conclusions from Algorithms](#conclusions-from-algorithms)
 - [Art](#art)
