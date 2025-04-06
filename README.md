@@ -17,7 +17,7 @@
   - [Execution](#execution)
 - [Features](#features)
 - [AI Features](#ai-features)
-- [Code](#code)
+- [Algorithms](#ai_algorithms)
 - [Conclusions from Algorithms](#conclusions-from-algorithms)
 - [Art](#art)
 
@@ -136,7 +136,7 @@ To execute the game, navigate to **/code** and simply run `python3 main_menu.py`
   - AI moves are displayed one by one, allowing players to follow the decision-making process.
   - Great for debugging or learning how the AI thinks.
 
-## Code
+## AI Algorithms
 
 In this Bird Sort game, we implemented several algorithms to solve the puzzles automatically. Each algorithm has its unique approach to find a solution, ranging from exhaustive search methods to heuristic-based optimizations. Below is a summary of the implemented algorithms and their logic:
 
