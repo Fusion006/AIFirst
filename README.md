@@ -124,6 +124,28 @@ To execute the game, navigate to **/code** and simply run `python3 main_menu.py`
 
 ## Code
 
+In this Bird Sort game, we implemented several algorithms to solve the puzzles automatically. Each algorithm has its unique approach to finding a solution, ranging from exhaustive search methods to heuristic-based optimizations. Below is a summary of the implemented algorithms and their logic:
+
+- **DFS (Depth-First Search)**  
+  The DFS algorithm explores the puzzle state space by diving deep into one branch of the search tree before backtracking. It uses a stack to keep track of states and explores all possible moves from the current state until a solution is found or all possibilities are exhausted. While DFS is memory-efficient, it may not always find the shortest solution.
+
+- **BFS (Breadth-First Search)**  
+  BFS explores the puzzle state space level by level, ensuring that the shortest solution is found. It uses a queue to manage states and systematically explores all possible moves from the current state before moving to the next level. However, BFS can be memory-intensive as it stores all states at the current depth.
+
+- **IDS (Iterative Deepening Search)**  
+  IDS combines the depth-first search's low memory usage with the breadth-first search's completeness. It incrementally increases the depth limit, performing a depth-limited search at each level. This ensures that the algorithm finds the shortest solution while avoiding excessive memory usage. IDS is particularly useful for puzzles with large state spaces where memory efficiency is critical.
+
+- **A Star**  
+  A* combines the benefits of DFS and BFS by using a heuristic function to guide the search toward the goal state. It calculates the cost of each state as `f_score = g_score + h_score`, where `g_score` is the cost to reach the current state and `h_score` is the estimated cost to reach the goal. A* guarantees the shortest solution if the heuristic is admissible.
+
+- **Weighted A Star**  
+  Weighted A* is a variation of A* that prioritizes speed over optimality. It modifies the cost calculation to `f_score = g_score + weight * h_score`, where the `weight` biases the search toward the goal state. This approach reduces the number of explored states but may not always find the shortest solution.
+
+- **Greedy Search**  
+  Greedy search focuses solely on the heuristic value (`h_score`) to decide the next move, ignoring the cost to reach the current state (`g_score`). It is faster than A* but does not guarantee an optimal solution. Greedy search is ideal for quickly finding a solution when optimality is not a priority.
+
+
+Each algorithm is implemented with a consistent interface, allowing easy comparison of their performance and behavior.
 
 ## Results
 
