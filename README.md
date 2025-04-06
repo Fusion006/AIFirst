@@ -4,9 +4,6 @@
 33.3% - up202208511 Tiago Teixeira \
 33.3% - up202300600 Yuka Sakai
 
-## Index
-[wddw](Game Description)
-
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
 
@@ -122,10 +119,10 @@ To execute the game, navigate to **/code** and simply run `python3 main_menu.py`
   - AI moves are displayed one by one, allowing players to follow the decision-making process.
   - Great for debugging or learning how the AI thinks.
 
+## Game Navigation
+
 ## Code
 
-
 ## Results
-
 
 ## Art
