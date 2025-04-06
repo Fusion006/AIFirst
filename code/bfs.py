@@ -129,7 +129,7 @@ Solution Steps:
         iterations = 0
         max_queue_size = 1
         start_time = time.perf_counter()
-        timeout_seconds = 60 # Algorithm stops running if a minute passes
+        timeout_seconds = 300 # Algorithm stops running if a five minutes pass
         timed_out = False
 
         while queue and iterations < max_iterations:
