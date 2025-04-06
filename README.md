@@ -29,6 +29,8 @@ Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Yo
   <em>Figure 1: Main Menu</em>
 </div>
 
+\
+\
 Navigating through the game is simple and intuitive. After opening the game you are presented with the Main Menu.
 - **PLAY**: allows you to play the Human Game Mode, where the user can play through each randomized level and reach the highest score!
 - **AI**: opens the AI Sub-Menu, presenting the 6 algorithms we have implemented.
