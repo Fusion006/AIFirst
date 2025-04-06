@@ -21,7 +21,6 @@
   - [Features](#features)
   - [AI Features](#ai-features)
   - [AI Algorithms](#ai-algorithms)
-  - [Conclusions from Algorithms](#conclusions-from-algorithms)
   - [Art](#art)
 
 ## Game Description
@@ -31,6 +30,15 @@ Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Yo
   <img src="images/README/menu.png" alt="Main Menu" width="300"/><br>
   <em>Figure 1: Main Menu</em>
 </div>
+
+\
+\
+Navigating through the game is simple and intuitive. After opening the game you are presented with the Main Menu.
+- **PLAY**: allows you to play the Human Game Mode, where the user can play through each randomized level and reach the highest score!
+- **AI**: opens the AI Sub-Menu, presenting the 6 algorithms we have implemented.
+  - This menu is very direct and user-friendly. There is also an Info Page inside this Sub-Menu to aid the user in case of questions on interface usage!
+- **QUIT**: allows the user to quit the game.
+- **INFO**: opens an About Us page with some relevant information about the project.
 
 ## How to Play / Rules
 In order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
@@ -84,7 +92,7 @@ Before running the game, ensure your environment is properly configured. Follow 
   - Download it from the [official Python website](https://www.python.org/downloads/)
 
 - **Dependencies**  
-  - Install the required Python packages with pip: `pip install pillow`.
+  - Install the required Python package **Pillow/PIL** with pip: `pip install pillow`.
 
 ### Execution
 To execute the game, navigate to **/code** and simply run `python3 main_menu.py`. 
@@ -162,13 +170,6 @@ In this Bird Sort game, we implemented several algorithms to solve the puzzles a
   Greedy search focuses solely on the heuristic value (`h_score`) to decide the next move, ignoring the cost to reach the current state (`g_score`). It is faster than A* but does not guarantee an optimal solution. Greedy search is ideal for quickly finding a solution when optimality is not a priority.
 
 Each algorithm is implemented with a consistent interface, allowing easy comparison of their performance and behavior.
-
-## Conclusions from Algorithms
-In our comparison of search algorithms in a game-solving context:
-- A* provided the best balance of optimality and performance.
-- Greedy and Weighted A* were faster but could return suboptimal solutions.
-- DFS and IDS were memory-efficient, with IDS being complete but slower.
-- BFS ensured optimality (in uniform-cost problems) but had high memory usage.
 
 ## Art
 For this project, we decided to make our own assets for the game. Each bird art and branch were digitally drawn by us and all backgrounds were created using [Canva](https://www.canva.com/). \
