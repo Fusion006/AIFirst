@@ -10,128 +10,122 @@
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
 
+<div align="center">
+  <img src="images/README/menu.png" alt="Main Menu" width="300"/><br>
+  <em>Figure 1: Main Menu</em>
+</div>
+
 ## Rules
-in order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
+In order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
 
-- Moving a Bird
-  - In order to move a bird from one branch to another, the player must check if the destination branch is either empty or has enough space. Moreover, the first bird on the destination branch must be of the same color as the one moving to it.
+### Branch Space:
+Each branch can hold up to 4 birds. If all birds in a branch are of the same color, that color along with this branch are removed from the puzzle.
 
-## Compilation
-PIL
-tkinter
+### Moving a Bird:
+To move a bird from one branch to another:
+- The **destination branch** must either be **empty** or have **enough space**.
+- If not empty, the **top bird** on the destination branch must be the **same color** as the bird being moved.
 
-## Execution
+<div align="center">
+  <img src="images/README/movingBird.jpg" alt="Source to Target" width="300"/><br>
+  <em>Figure 2: Moving a single bird</em>
+</div>
+
+### Moving a Group of Birds:
+This rule follows the same principles as above, with one addition:
+- Birds of the **same color**, if **stacked together**, **must move together** as a group.
+- The destination must be either empty or have **enough space for the entire group**.
+
+<div align="center">
+  <img src="images/README/movingGroup.jpg" alt="Group Move" width="300"/><br>
+  <em>Figure 3: Moving a group of birds</em>
+</div>
+
+### Forming a Sequence:
+- Once **4 birds of the same color** are placed on the same branch, that branch **breaks**, increasing the player’s score.
+- As mentioned in the first rule, both the **branch** and the **birds** are removed from the puzzle.
+
+<div align="center">
+  <img src="images/README/breakbranch.gif" alt="Branch Break" width="300"/><br>
+  <em>Figure 4: Breaking a branch with 4 same-colored birds</em>
+</div>
+
+### Level Completion
+A level is completed when all branches have been cleared by correctly grouping and removing all birds of the same color. Once done, you'll be presented with options to either move to the next puzzle or return to the main menu.
+
+<div align="center">
+  <img src="images/README/levelComplete.png" alt="Level complete options" width="300"/><br>
+  <em>Figure 5: Options displayed after finishing a level</em>
+</div>
+
+## Setup and Execution
+Before running the game, ensure your environment is properly configured. Follow the steps below to install the necessary tools and dependencies.
+
+### Requirements:
+
+- **Python 3.10 or higher**  
+  - Download it from the [official Python website](https://www.python.org/downloads/)
+
+- **Dependencies**  
+  - Install the required Python packages with pip: `pip install pillow`.
+
+### Execution
+To execute the game, navigate to **/code** and simply run `python3 main_menu.py`. 
 
 ## Features
 
+- **Interactive Gameplay**
+  - Move birds between branches based on simple, intuitive rules.
+  - Group movements are enforced when birds of the same color are stacked.
+  - Highlighted branches help track the currently selected branch.
+
+- **Color-Matching Puzzle Mechanics**
+  - Match four birds of the same color to break a branch and score points.
+  - Requires strategic thinking to avoid deadlocks and optimize move efficiency.
+
+- **Hints System**
+  - Get assistance when you're stuck with a built-in hint system.
+  - Highlights a possible valid move to help you progress without giving away the entire solution.
+
+- **Score System**
+  - Points are awarded for every successfully completed sequence.
+  - Progress is tracked in Human Mode to encourage high-score chasing and replayability.
+
+- **Visual Feedback**
+  - Smooth animations and clear indicators for valid and invalid actions.
+  - Distinct visual design for birds, branches, and UI elements.
+
+- **Rule-Based Logic**
+  - Strictly defined mechanics ensure fairness and consistent gameplay behavior.
+  - Puzzle logic is transparent, making the game feel intuitive yet strategic.
+
+- **Replayability**
+  - Random puzzle generation guarantees a unique experience every time you play.
+
+- **Challenging Yet Accessible**
+  - Easy to learn, difficult to master — with increasing complexity at higher levels.
+
+### AI Features
+
+- **Multiple Algorithms**
+  - Includes a variety of AI approaches to solve puzzles (DFS, BFS, A*, and more!)
+
+- **Game State Control**
+  - Supports puzzle generation by difficulty level or direct loading from `.txt` files.
+  - Ideal for testing, benchmarking, or replaying specific puzzle states.
+
+- **Statistics Display**
+  - Tracks AI performance metrics such as number of moves, search depth, and execution time.
+  - Helpful for comparing and analyzing algorithm efficiency.
+
+- **Step-by-Step Visualization**
+  - AI moves are displayed one by one, allowing players to follow the decision-making process.
+  - Great for debugging or learning how the AI thinks.
+
 ## Code
+
 
 ## Results
 
+
 ## Art
-
-
-
-
-
-
-
-
-
-
-
-
-## **Step 1: Understanding the Game (Bird Sort 2 - Color Puzzle)**
-
-The Bird Sort 2 - Color Puzzle is a solitaire sorting puzzle where the player must arrange birds of different colors into separate braqnches.
-
-The game mechanics are similar to the Water Sort Puzzle Game, where birds can only be moved according to specific rules.
-
-### **Game Elements:**
-- **Board Representation**: A set of branches, each containing a stack of birds in different colors.
-- **Valid Moves**:
-  - A bird can only be moved to another branch if:
-    - The branch is not full.
-    - The top bird of the destination branch is the same color as the bird being moved.
-    - The branch is empty (any bird can be placed in an empty branch).
-- **Goal**: Arrange the birds so that each branch contains only birds of a single color.
-
----
-
-## **Step 2: Defining the AI Approach**
-
-Since the AI must solve this puzzle using search methods, we need to define:
-
-1. **State Representation:**
-   - The game state must encode the current arrangement of birds in the branches.
-   - A possible representation is a list of lists, where each sublist represents a branch and contains color-coded bird identifiers.
-
-2. **State Transitions:**
-   - Every valid move results in a new state.
-   - A function should generate possible moves and apply them to create new states.
-
-3. **Goal State Check:**
-   - The game is solved when all branches contain birds of only one color.
-
-4. **Search Algorithms:**
-   - **Uninformed Search Methods**:
-     - Breadth-First Search (BFS)
-     - Depth-First Search (DFS)
-     - Iterative Deepening Search
-     - Uniform Cost Search (UCS)
-   - **Heuristic Search Methods**:
-     - Greedy Best-First Search
-     - A* Algorithm
-     - Weighted A*
-
-5. **Heuristic Functions:**
-   - Possible heuristics include:
-     - The number of branches that already contain sorted birds.
-     - The number of misplaced birds.
-     - The number of empty branches available.
-
----
-
-## **Step 3: Basic Implementation Plan**
-
-1. **Implement the Board Representation**:
-   - Use a nested list to represent the branches and the birds in them.
-   - Create functions to initialize the board from a text file.
-
-2. **Implement Move Validation and State Generation**:
-   - Develop a function to check if a move is valid.
-   - Implement a function that generates all possible next states from the current state.
-
-3. **Implement Basic Human-Playable Mode**:
-   - Allow users to manually move birds between branches.
-   - Display the board state in the console.
-
-4. **Implement Search Algorithms One by One**:
-   - Implement BFS, DFS, and other uninformed search methods.
-   - Implement heuristic-based methods (A*, Weighted A*).
-   - Compare search methods based on efficiency (time, memory, solution quality).
-
-5. **Optimize Heuristic Search**:
-   - Experiment with different heuristic functions to improve the efficiency of A* search.
-   - Implement priority queue-based state exploration.
-
-6. **Add Graphical Interface**:
-   - Use `pygame` or `tkinter` to create a visual representation of the puzzle.
-   - Implement a mode where the AI solves the puzzle visually.
-   - Add a hint system for human players.
-
-7. **Final Testing and Optimization**:
-   - Test the application with multiple puzzles of varying difficulty.
-   - Record performance metrics (time, memory usage, solution length).
-   - Optimize code for efficiency and clarity.
-
----
-
-## **Step 4: Choosing Python Libraries**
-
-- `heapq` – For priority queue management in A* and Weighted A*.
-- `pygame` or `tkinter` – For GUI visualization of the puzzle.
-- `pickle` or `json` – For saving and loading game states.
-- `psutil` – For tracking memory usage during search execution (optional).
-
----
