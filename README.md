@@ -1,13 +1,34 @@
-# Bird Sort 2 - Color Puzzle
+# Bird Sort - Color Puzzle
+## Group A1-88
+33.3% - up202208429 Luís Martim \
+33.3% - up202208511 Tiago Teixeira \
+33.3% - up202300600 Yuka Sakai
 
-Team Info
-Game Description
-Compilation
-Execution
-Code explanation
-Results
-Features
-Art
+## Index
+[wddw](Game Description)
+
+## Game Description
+Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
+
+## Rules
+in order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
+
+- Moving a Bird
+  - In order to move a bird from one branch to another, the player must check if the destination branch is either empty or has enough space. Moreover, the first bird on the destination branch must be of the same color as the one moving to it.
+
+## Compilation
+PIL
+tkinter
+
+## Execution
+
+## Features
+
+## Code
+
+## Results
+
+## Art
 
 
 
@@ -19,13 +40,6 @@ Art
 
 
 
-
-
-[Powerpoint checkpoint 1](https://www.canva.com/design/DAGhUuea1a8/CNkov_jamORCYTxVwx-6rA/edit?utm_content=DAGhUuea1a8&utm_campaign=designshare&utm_medium=link2&utm_source=sharebutton)
-
-[See Search Problem in Detail](SearchProblem.md)
-
----
 
 ## **Step 1: Understanding the Game (Bird Sort 2 - Color Puzzle)**
 
