@@ -1,0 +1,25 @@
+Algorithm: Greedy
+Difficulty: Init4             
+Colors: 6
+Branches: 9
+Time Taken: 0.002186s
+States Explored: 16
+Avg Branching Factor (~ moves/step)= 11.31
+Solution Steps:
+1. (4, 5)
+2. (8, 2)
+3. (0, 8)
+4. (0, 6)
+5. (5, 7)
+6. (5, 8)
+7. (6, 5)
+8. (7, 6)
+9. (4, 7)
+10. (3, 4)
+11. (3, 8)
+12. (2, 4)
+13. (2, 7)
+14. (0, 1)
+15. (2, 4)
+16. (3, 5)
+17. None

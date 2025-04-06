@@ -1,0 +1,26 @@
+Algorithm: IDS
+Difficulty: Init2             
+Colors: 5
+Branches: 8
+Time Taken: 271.803574s
+States Explored: 15
+Depth Limit: 16
+Nodes Generated: 4761855
+Solution Steps:
+1. (0, 4)
+2. (0, 5)
+3. (3, 7)
+4. (3, 4)
+5. (2, 3)
+6. (2, 5)
+7. (2, 3)
+8. (4, 2)
+9. (6, 2)
+10. (5, 2)
+11. (4, 5)
+12. (7, 4)
+13. (3, 7)
+14. (0, 1)
+15. (2, 6)
+16. (4, 5)
+17. None

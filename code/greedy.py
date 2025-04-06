@@ -45,9 +45,9 @@ class BirdSortGreedy:
             number = match.group(2)
             
             if "initial_states" in state_type:
-                return f"I{number}"
+                return f"Init{number}"
             elif "mid_states" in state_type:
-                return f"M{number}"
+                return f"Mid{number}"
         
         filename = os.path.basename(path)
         return os.path.splitext(filename)[0]

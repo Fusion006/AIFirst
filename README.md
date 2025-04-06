@@ -4,8 +4,25 @@
 33.3% - up202208511 Tiago Teixeira \
 33.3% - up202300600 Yuka Sakai
 
-## Index
-[wddw](Game Description)
+# Index
+- [Bird Sort - Color Puzzle](#bird-sort---color-puzzle)
+  - [Group A1-88](#group-a1-88)
+- [Index](#index)
+  - [Game Description](#game-description)
+  - [Rules](#rules)
+    - [Branch Space:](#branch-space)
+    - [Moving a Bird:](#moving-a-bird)
+    - [Moving a Group of Birds:](#moving-a-group-of-birds)
+    - [Forming a Sequence:](#forming-a-sequence)
+    - [Level Completion](#level-completion)
+  - [Setup and Execution](#setup-and-execution)
+    - [Requirements:](#requirements)
+    - [Execution](#execution)
+  - [Features](#features)
+    - [AI Features](#ai-features)
+  - [Code](#code)
+  - [Conclusions from Algorithms](#conclusions-from-algorithms)
+  - [Art](#art)
 
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
@@ -27,7 +44,7 @@ To move a bird from one branch to another:
 - If not empty, the **top bird** on the destination branch must be the **same color** as the bird being moved.
 
 <div align="center">
-  <img src="images/README/movingBird.jpg" alt="Source to Target" width="300"/><br>
+  <img src="images/README/movingBird.jpg" alt="Source to Target" width="450"/><br>
   <em>Figure 2: Moving a single bird</em>
 </div>
 
@@ -37,7 +54,7 @@ This rule follows the same principles as above, with one addition:
 - The destination must be either empty or have **enough space for the entire group**.
 
 <div align="center">
-  <img src="images/README/movingGroup.jpg" alt="Group Move" width="300"/><br>
+  <img src="images/README/movingGroup.jpg" alt="Group Move" width="450"/><br>
   <em>Figure 3: Moving a group of birds</em>
 </div>
 
@@ -124,10 +141,10 @@ To execute the game, navigate to **/code** and simply run `python3 main_menu.py`
 
 ## Code
 
-In this Bird Sort game, we implemented several algorithms to solve the puzzles automatically. Each algorithm has its unique approach to finding a solution, ranging from exhaustive search methods to heuristic-based optimizations. Below is a summary of the implemented algorithms and their logic:
+In this Bird Sort game, we implemented several algorithms to solve the puzzles automatically. Each algorithm has its unique approach to find a solution, ranging from exhaustive search methods to heuristic-based optimizations. Below is a summary of the implemented algorithms and their logic:
 
 - **DFS (Depth-First Search)**  
-  The DFS algorithm explores the puzzle state space by diving deep into one branch of the search tree before backtracking. It uses a stack to keep track of states and explores all possible moves from the current state until a solution is found or all possibilities are exhausted. While DFS is memory-efficient, it may not always find the shortest solution.
+  The DFS algorithm explores the puzzle state space by diving deep into one branch of the search tree before backtracking. It uses a stack to keep track of states and explores all possible moves from the current state until a solution is found or all possibilities are exhausted. While DFS is memory-efficient, it may not always find the shortest solution (very noticeable at high difficulty levels).
 
 - **BFS (Breadth-First Search)**  
   BFS explores the puzzle state space level by level, ensuring that the shortest solution is found. It uses a queue to manage states and systematically explores all possible moves from the current state before moving to the next level. However, BFS can be memory-intensive as it stores all states at the current depth.
@@ -144,10 +161,20 @@ In this Bird Sort game, we implemented several algorithms to solve the puzzles a
 - **Greedy Search**  
   Greedy search focuses solely on the heuristic value (`h_score`) to decide the next move, ignoring the cost to reach the current state (`g_score`). It is faster than A* but does not guarantee an optimal solution. Greedy search is ideal for quickly finding a solution when optimality is not a priority.
 
-
 Each algorithm is implemented with a consistent interface, allowing easy comparison of their performance and behavior.
 
-## Results
-
+## Conclusions from Algorithms
+In our comparison of search algorithms in a game-solving context:
+- A* provided the best balance of optimality and performance.
+- Greedy and Weighted A* were faster but could return suboptimal solutions.
+- DFS and IDS were memory-efficient, with IDS being complete but slower.
+- BFS ensured optimality (in uniform-cost problems) but had high memory usage.
 
 ## Art
+For this project, we decided to make our own assets for the game. Each bird art and branch were digitally drawn by us and all backgrounds were created using [Canva](https://www.canva.com/). \
+Below is our sprite sheet for the game!
+
+<div align="center">
+  <img src="images/README/sprite_sheet.png" alt="Sprite Sheet" width="450"/><br>
+  <em>Figure 6: Birds and Branches</em>
+</div>
