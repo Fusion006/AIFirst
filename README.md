@@ -17,7 +17,7 @@
   - [Execution](#execution)
 - [Features](#features)
 - [AI Features](#ai-features)
-- [Algorithms](#ai_algorithms)
+- [Algorithms](#ai-algorithms)
 - [Conclusions from Algorithms](#conclusions-from-algorithms)
 - [Art](#art)
 
