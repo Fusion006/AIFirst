@@ -5,21 +5,24 @@
 33.3% - up202300600 Yuka Sakai
 
 # Index
-- [Game Description](#game-description)
-- [Rules](#rules)
-  - [Branch Space](#branch-space)
-  - [Moving a Bird](#moving-a-bird)
-  - [Moving a Group of Birds](#moving-a-group-of-birds)
-  - [Forming a Sequence](#forming-a-sequence)
-  - [Level Completion](#level-completion)
-- [Setup and Execution](#setup-and-execution)
-  - [Requirements](#requirements)
-  - [Execution](#execution)
-- [Features](#features)
-- [AI Features](#ai-features)
-- [Algorithms](#ai-algorithms)
-- [Conclusions from Algorithms](#conclusions-from-algorithms)
-- [Art](#art)
+- [Bird Sort - Color Puzzle](#bird-sort---color-puzzle)
+  - [Group A1-88](#group-a1-88)
+- [Index](#index)
+  - [Game Description](#game-description)
+  - [How to Play / Rules](#how-to-play--rules)
+    - [Branch Space](#branch-space)
+    - [Moving a Bird](#moving-a-bird)
+    - [Moving a Group of Birds](#moving-a-group-of-birds)
+    - [Forming a Sequence](#forming-a-sequence)
+    - [Level Completion](#level-completion)
+  - [Setup and Execution](#setup-and-execution)
+    - [Requirements](#requirements)
+    - [Execution](#execution)
+  - [Features](#features)
+  - [AI Features](#ai-features)
+  - [AI Algorithms](#ai-algorithms)
+  - [Conclusions from Algorithms](#conclusions-from-algorithms)
+  - [Art](#art)
 
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
@@ -29,7 +32,7 @@ Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Yo
   <em>Figure 1: Main Menu</em>
 </div>
 
-## Rules
+## How to Play / Rules
 In order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
 
 ### Branch Space
