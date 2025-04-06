@@ -6,7 +6,7 @@
 
 # Index
 - [Game Description](#game-description)
-- [Rules](#rules)
+- [How to Play / Rules](##how-to-play--rules)
   - [Branch Space](#branch-space)
   - [Moving a Bird](#moving-a-bird)
   - [Moving a Group of Birds](#moving-a-group-of-birds)
@@ -29,7 +29,14 @@ Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Yo
   <em>Figure 1: Main Menu</em>
 </div>
 
-## Rules
+Navigating through the game is simple and intuitive. After opening the game you are presented with the Main Menu.
+- **PLAY**: allows you to play the Human Game Mode, where the user can play through each randomized level and reach the highest score!
+- **AI**: opens the AI Sub-Menu, presenting the 6 algorithms we have implemented.
+  - This menu is very direct and user-friendly. There is also an Info Page inside this Sub-Menu to aid the user in case of questions on interface usage!
+- **QUIT**: allows the user to quit the game.
+- **INFO**: opens an About Us page with some relevant information about the project.
+
+## How to Play / Rules
 In order to solve the color puzzle, we defined a set of rules for you to follow and understand before you start playing!
 
 ### Branch Space
@@ -81,7 +88,7 @@ Before running the game, ensure your environment is properly configured. Follow 
   - Download it from the [official Python website](https://www.python.org/downloads/)
 
 - **Dependencies**  
-  - Install the required Python packages with pip: `pip install pillow`.
+  - Install the required Python package **Pillow/PIL** with pip: `pip install pillow`.
 
 ### Execution
 To execute the game, navigate to **/code** and simply run `python3 main_menu.py`. 
