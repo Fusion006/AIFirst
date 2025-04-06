@@ -21,7 +21,7 @@
   - [Features](#features)
     - [AI Features](#ai-features)
   - [Code](#code)
-  - [Results from Algorithms](#results-from-algorithms)
+  - [Conclusions from Algorithms](#conclusions-from-algorithms)
   - [Art](#art)
 
 ## Game Description
@@ -163,8 +163,12 @@ In this Bird Sort game, we implemented several algorithms to solve the puzzles a
 
 Each algorithm is implemented with a consistent interface, allowing easy comparison of their performance and behavior.
 
-## Results from Algorithms
-
+## Conclusions from Algorithms
+In our comparison of search algorithms in a game-solving context:
+- A* provided the best balance of optimality and performance.
+- Greedy and Weighted A* were faster but could return suboptimal solutions.
+- DFS and IDS were memory-efficient, with IDS being complete but slower.
+- BFS ensured optimality (in uniform-cost problems) but had high memory usage.
 
 ## Art
 For this project, we decided to make our own assets for the game. Each bird art and branch were digitally drawn by us and all backgrounds were created using [Canva](https://www.canva.com/). \
