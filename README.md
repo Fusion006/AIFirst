@@ -23,7 +23,7 @@
 
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
-\
+
 <div align="center">
   <img src="images/README/menu.png" alt="Main Menu" width="300"/><br>
   <em>Figure 1: Main Menu</em>
@@ -48,7 +48,7 @@ Each branch can hold up to 4 birds. If all birds in a branch are of the same col
 To move a bird from one branch to another:
 - The **destination branch** must either be **empty** or have **enough space**.
 - If not empty, the **top bird** on the destination branch must be the **same color** as the bird being moved.
-\
+
 <div align="center">
   <img src="images/README/movingBird.jpg" alt="Source to Target" width="450"/><br>
   <em>Figure 2: Moving a single bird</em>
@@ -58,7 +58,7 @@ To move a bird from one branch to another:
 This rule follows the same principles as above, with one addition:
 - Birds of the **same color**, if **stacked together**, **must move together** as a group.
 - The destination must be either empty or have **enough space for the entire group**.
-\
+
 <div align="center">
   <img src="images/README/movingGroup.jpg" alt="Group Move" width="450"/><br>
   <em>Figure 3: Moving a group of birds</em>
@@ -67,7 +67,7 @@ This rule follows the same principles as above, with one addition:
 ### Forming a Sequence
 - Once **4 birds of the same color** are placed on the same branch, that branch **breaks**, increasing the player’s score.
 - As mentioned in the first rule, both the **branch** and the **birds** are removed from the puzzle.
-\
+
 <div align="center">
   <img src="images/README/breakbranch.gif" alt="Branch Break" width="300"/><br>
   <em>Figure 4: Breaking a branch with 4 same-colored birds</em>
@@ -75,7 +75,7 @@ This rule follows the same principles as above, with one addition:
 
 ### Level Completion
 A level is completed when all branches have been cleared by correctly grouping and removing all birds of the same color. Once done, you'll be presented with options to either move to the next puzzle or return to the main menu.
-\
+
 <div align="center">
   <img src="images/README/levelComplete.png" alt="Level complete options" width="300"/><br>
   <em>Figure 5: Options displayed after finishing a level</em>
@@ -179,7 +179,7 @@ In our comparison of search algorithms in a game-solving context:
 ## Art
 For this project, we decided to make our own assets for the game. Each bird art and branch were digitally drawn by us and all backgrounds were created using [Canva](https://www.canva.com/). \
 Below is our sprite sheet for the game!
-\
+
 <div align="center">
   <img src="images/README/sprite_sheet.png" alt="Sprite Sheet" width="450"/><br>
   <em>Figure 6: Birds and Branches</em>
