@@ -6,7 +6,7 @@
 
 # Index
 - [Game Description](#game-description)
-- [How to Play / Rules](##how-to-play--rules)
+- [How to Play / Rules](#how-to-play--rules)
   - [Branch Space](#branch-space)
   - [Moving a Bird](#moving-a-bird)
   - [Moving a Group of Birds](#moving-a-group-of-birds)
