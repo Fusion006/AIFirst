@@ -5,6 +5,9 @@
 33.3% - up202300600 Yuka Sakai
 
 # Index
+- [Setup and Execution](#setup-and-execution)
+  - [Requirements](#requirements)
+  - [Execution](#execution)
 - [Game Description](#game-description)
 - [How to Play / Rules](#how-to-play--rules)
   - [Branch Space](#branch-space)
@@ -12,13 +15,24 @@
   - [Moving a Group of Birds](#moving-a-group-of-birds)
   - [Forming a Sequence](#forming-a-sequence)
   - [Level Completion](#level-completion)
-- [Setup and Execution](#setup-and-execution)
-  - [Requirements](#requirements)
-  - [Execution](#execution)
 - [Features](#features)
 - [AI Features](#ai-features)
 - [AI Algorithms](#ai-algorithms)
 - [Art](#art)
+
+## Setup and Execution
+Before running the game, ensure your environment is properly configured. Follow the steps below to install the necessary tools and dependencies.
+
+### Requirements
+
+- **Python 3.10 or higher**  
+  - Download it from the [official Python website](https://www.python.org/downloads/)
+
+- **Dependencies**  
+  - Install the required Python package **Pillow/PIL** with pip: `pip install pillow`.
+
+### Execution
+To play the game, simply execute `make run` in a terminal, while in the root folder, and enjoy!
 
 ## Game Description
 Bird Sort is a single-player puzzle game inspired by color sorting mechanics. Your objective is to sort birds of the same color into individual branches by moving them one at a time, following a set of simple rules. The game challenges your logical thinking and strategic planning as the difficulty gradually increases with each level. 
@@ -79,20 +93,6 @@ A level is completed when all branches have been cleared by correctly grouping a
   <img src="images/README/levelComplete.png" alt="Level complete options" width="300"/><br>
   <em>Figure 5: Options displayed after finishing a level</em>
 </div>
-
-## Setup and Execution
-Before running the game, ensure your environment is properly configured. Follow the steps below to install the necessary tools and dependencies.
-
-### Requirements
-
-- **Python 3.10 or higher**  
-  - Download it from the [official Python website](https://www.python.org/downloads/)
-
-- **Dependencies**  
-  - Install the required Python package **Pillow/PIL** with pip: `pip install pillow`.
-
-### Execution
-To execute the game, navigate to **/code** and simply run `python3 main_menu.py`. 
 
 ## Features
 
