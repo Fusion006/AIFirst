@@ -1,7 +1,7 @@
-pink blue yellow
-brown yellow pink
-green brown brown
-blue yellow brown
-yellow pink blue
-blue green green
-green pink
+blue pink brown
+blue pink brown
+blue green pink
+green yellow brown
+green yellow brown
+green blue yellow
+pink yellow
