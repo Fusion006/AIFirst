@@ -1,9 +1,9 @@
-pink yellow
-pink red blue
-blue purple pink
-white yellow purple blue
-yellow red brown
-pink blue white red
-yellow purple white
-brown red brown
-white brown purple
+brown yellow white cyan
+green pink yellow blue
+brown yellow pink cyan
+brown pink green
+blue green brown
+pink cyan yellow green
+blue
+blue cyan white
+white white

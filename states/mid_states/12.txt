@@ -1,14 +1,14 @@
-brown purple
-pink white brown
-yellow white pink red
-brown
-white pink orange
-cyan blue red
-yellow purple green orange
-cyan orange orange
-cyan purple cyan green
-blue red blue
-green pink yellow red
-green yellow
-blue
-white brown purple
+red
+purple blue
+blue white purple
+red green pink
+cyan orange brown
+cyan orange yellow pink
+white orange yellow
+red brown
+red white blue
+brown white orange blue
+cyan yellow
+pink pink green cyan
+green purple
+purple brown yellow green

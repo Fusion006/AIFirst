@@ -1,8 +1,8 @@
-green blue white
-green green green
-red blue red
-red white orange
-orange white
-orange blue
+cyan purple red
+white red cyan
+purple red blue
+purple blue purple
 blue white
-red orange
+white blue
+white cyan
+cyan red
